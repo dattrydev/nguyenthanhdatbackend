@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -30,16 +31,18 @@ public class SecurityConfig {
         BlogUserDetailsService blogUserDetailsService = new BlogUserDetailsService(userRepository);
 
         String email = "user@test.com";
-        userRepository.findByEmail(email).orElseGet(() ->{
-            User user = User.builder()
-                    .name("Test User")
-                    .email(email)
-                    .role(Role.ADMIN)
-                    .password(passwordEncoder().encode("password"))
-                    .build();
-
-            return userRepository.save(user);
-        });
+        userRepository.findByEmail(email).ifPresentOrElse(
+                user -> {},
+                () -> {
+                    User user = User.builder()
+                            .name("Test User")
+                            .email(email)
+                            .role(Role.ADMIN)
+                            .password(passwordEncoder().encode("password"))
+                            .build();
+                    userRepository.save(user);
+                }
+        );
 
         return blogUserDetailsService;
     }
@@ -49,9 +52,6 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/post/**").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/v1/tags/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
@@ -63,17 +63,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence charSequence) {
-                return charSequence.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence charSequence, String s) {
-                return charSequence.toString().equals(s);
-            }
-        };
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

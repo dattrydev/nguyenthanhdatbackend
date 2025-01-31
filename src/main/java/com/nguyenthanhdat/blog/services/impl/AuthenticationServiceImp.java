@@ -28,11 +28,10 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private Long jwtExpiryMs = 86400000L;
+    private final Long jwtExpiryMs = 86400000L;
     @Override
     public UserDetails authenticate(String email, String password) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-
         return userDetailsService.loadUserByUsername(email);
     }
 
