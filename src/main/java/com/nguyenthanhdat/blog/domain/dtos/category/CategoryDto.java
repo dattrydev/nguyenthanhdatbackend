@@ -1,18 +1,18 @@
-package com.nguyenthanhdat.blog.domain.dtos;
+package com.nguyenthanhdat.blog.domain.dtos.category;
 
-import com.nguyenthanhdat.blog.domain.entities.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TagDto {
+public class CategoryDto {
+    private UUID id;
     private String name;
-    private Set<Post> posts;
+    private int postCount;
 }

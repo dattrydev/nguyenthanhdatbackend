@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.controllers;
 
-import com.nguyenthanhdat.blog.domain.dtos.CategoryDto;
-import com.nguyenthanhdat.blog.domain.dtos.CreateCategoryRequest;
+import com.nguyenthanhdat.blog.domain.dtos.category.CategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.category.CreateCategoryRequest;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.mappers.CategoryMapper;
 import com.nguyenthanhdat.blog.services.CategoryService;

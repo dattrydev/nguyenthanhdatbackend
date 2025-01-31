@@ -1,8 +1,8 @@
 package com.nguyenthanhdat.blog.mappers;
 
 import com.nguyenthanhdat.blog.domain.PostStatus;
-import com.nguyenthanhdat.blog.domain.dtos.CategoryDto;
-import com.nguyenthanhdat.blog.domain.dtos.CreateCategoryRequest;
+import com.nguyenthanhdat.blog.domain.dtos.category.CategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.category.CreateCategoryRequest;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import org.mapstruct.Mapper;
