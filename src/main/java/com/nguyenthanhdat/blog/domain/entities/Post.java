@@ -1,8 +1,11 @@
 package com.nguyenthanhdat.blog.domain.entities;
 
 import com.nguyenthanhdat.blog.domain.PostStatus;
+import com.nguyenthanhdat.blog.utils.SlugGenerator;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -19,7 +22,7 @@ import java.util.UUID;
 @Builder
 public class Post {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
@@ -34,6 +37,9 @@ public class Post {
 
     @Column(nullable = false)
     private Integer readingTime;
+
+    @Column(nullable = false, unique = true)
+    private String slug;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
@@ -51,9 +57,11 @@ public class Post {
     )
     private Set<Tag> tags = new HashSet<>();
 
-    @Column(nullable = false)
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
@@ -70,13 +78,10 @@ public class Post {
     }
 
     @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
     @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    protected void generateSlug() {
+        if (slug == null || slug.isEmpty()) {
+            slug = SlugGenerator.toSlug(title);
+        }
     }
 }

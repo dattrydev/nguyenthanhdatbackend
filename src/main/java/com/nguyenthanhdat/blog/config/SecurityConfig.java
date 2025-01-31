@@ -1,5 +1,6 @@
 package com.nguyenthanhdat.blog.config;
 
+import com.nguyenthanhdat.blog.domain.Role;
 import com.nguyenthanhdat.blog.domain.entities.User;
 import com.nguyenthanhdat.blog.repositories.UserRepository;
 import com.nguyenthanhdat.blog.security.BlogUserDetailsService;
@@ -33,6 +34,7 @@ public class SecurityConfig {
             User user = User.builder()
                     .name("Test User")
                     .email(email)
+                    .role(Role.ADMIN)
                     .password(passwordEncoder().encode("password"))
                     .build();
 
