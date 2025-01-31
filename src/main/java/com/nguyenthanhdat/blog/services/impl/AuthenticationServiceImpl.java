@@ -21,14 +21,13 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationServiceImp implements AuthenticationService {
+public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
 
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private final Long jwtExpiryMs = 86400000L;
     @Override
     public UserDetails authenticate(String email, String password) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
@@ -38,6 +37,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Override
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        long jwtExpiryMs = 86400000L;
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())

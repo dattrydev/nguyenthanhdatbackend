@@ -1,14 +1,10 @@
 package com.nguyenthanhdat.blog.domain.entities;
 
-import com.nguyenthanhdat.blog.domain.Role;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -33,22 +29,6 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
-    @Column()
-    private String avatarUrl;
-
-    @Column()
-    private String gooleId;
-
-    @Column()
-    private String facebookId;
-
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts = new ArrayList<>();
-
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -63,12 +43,5 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id, email, password, name, createdAt);
-    }
-
-    @PrePersist
-    public void prePersist() {
-        if (role == null) {
-            role = Role.USER;
-        }
     }
 }
