@@ -40,6 +40,15 @@ public class CategoryController {
     );
     }
 
+    @PatchMapping
+    public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody Category category) {
+        Category categoryToUpdate = categoryService.updateCategory(category);
+        return new ResponseEntity<>(
+            categoryMapper.toDto(categoryToUpdate),
+            HttpStatus.OK
+        );
+    }
+
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
         categoryService.deleteCategory(id);
