@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +21,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<Tag> listTags() {
-        List<Tag> tags = tagRepository.findAll();
-        return tags;
+        return tagRepository.findAll();
     }
 
     public Optional<TagDto> getTagByName(String name) {
@@ -35,6 +35,18 @@ public class TagServiceImpl implements TagService {
             throw new IllegalArgumentException("Tag with name " + tag.getName() + " already exists");
         } else {
             return tagRepository.save(tag);
+        }
+    }
+
+    @Override
+    public Tag updateTag(Tag tag) {
+        Optional<Tag> existingTag = tagRepository.findById(tag.getId());
+        if(existingTag.isPresent()) {
+            Tag updatedTag = existingTag.get();
+            updatedTag.setName(tag.getName());
+            return tagRepository.save(updatedTag);
+        } else {
+            throw new IllegalArgumentException("Tag with name " + tag.getName() + " not found");
         }
     }
 

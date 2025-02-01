@@ -48,6 +48,13 @@ public class TagController {
         );
     }
 
+    @PatchMapping
+    public ResponseEntity<TagDto> updateTag(@Valid @RequestBody Tag tag) {
+        Tag updatedTag = tagService.updateTag(tag);
+        return ResponseEntity.ok(tagMapper.toDto(updatedTag));
+    }
+
+
     @DeleteMapping
     public ResponseEntity<Void> deleteTag(@RequestParam(name = "name") String name) {
         tagService.deleteTag(name);
