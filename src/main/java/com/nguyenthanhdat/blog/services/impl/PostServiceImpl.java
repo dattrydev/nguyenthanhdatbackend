@@ -1,6 +1,5 @@
 package com.nguyenthanhdat.blog.services.impl;
 
-import com.nguyenthanhdat.blog.domain.PostStatus;
 import com.nguyenthanhdat.blog.domain.dtos.post.CreatePostDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
@@ -10,8 +9,9 @@ import com.nguyenthanhdat.blog.repositories.PostRepository;
 import com.nguyenthanhdat.blog.repositories.TagRepository;
 import com.nguyenthanhdat.blog.services.FileStorageService;
 import com.nguyenthanhdat.blog.services.PostService;
+import com.nguyenthanhdat.blog.utils.PresignedUrl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,11 +29,25 @@ public class PostServiceImpl implements PostService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final FileStorageService fileStorageService;
+    private final PresignedUrl presignedUrl;
+
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
 
     @Override
     public List<Post> getAllPosts() {
-        return postRepository.findAll();
+        List<Post> posts = postRepository.findAll();
+
+        for (Post post : posts) {
+            if (post.getThumbnailUrl() != null) {
+                String thumbnailUrl = presignedUrl.createPresignedGetUrl(bucketName, post.getThumbnailUrl());
+                post.setThumbnailUrl(thumbnailUrl);
+            }
+        }
+
+        return posts;
     }
+
 
     @Override
     public Optional<Post> getPostBySlug(String slug) {

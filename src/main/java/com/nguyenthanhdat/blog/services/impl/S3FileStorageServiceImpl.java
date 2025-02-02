@@ -24,18 +24,19 @@ public class S3FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public String uploadFile(MultipartFile file) {
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String fileKey = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
         try (InputStream inputStream = file.getInputStream()) {
             s3Client.putObject(PutObjectRequest.builder()
                             .bucket(bucketName)
-                            .key(fileName)
+                            .key(fileKey)
                             .build(),
                     software.amazon.awssdk.core.sync.RequestBody.fromInputStream(inputStream, file.getSize()));
         } catch (IOException e) {
             throw new RuntimeException("Error uploading file to S3", e);
         }
 
-        return "https://" + bucketName + ".s3.amazonaws.com/" + fileName;
+        return fileKey;
     }
+
 }
