@@ -1,5 +1,6 @@
 package com.nguyenthanhdat.blog.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "category")
     private List<Post> posts = new ArrayList<>();
 

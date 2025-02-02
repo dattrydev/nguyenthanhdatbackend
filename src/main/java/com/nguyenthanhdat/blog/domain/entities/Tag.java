@@ -1,6 +1,7 @@
 package com.nguyenthanhdat.blog.domain.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class Tag {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "tags")
     private Set<Post> posts;
 
