@@ -24,7 +24,6 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "category")
     private List<Post> posts = new ArrayList<>();
 

@@ -50,7 +50,23 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Optional<Post> getPostBySlug(String slug) {
-        return postRepository.findBySlug(slug);
+        Post post = postRepository.findBySlug(slug);
+        if (post != null) {
+            if (post.getThumbnailUrl() != null) {
+                String thumbnailUrl = presignedUrl.createPresignedGetUrl(bucketName, post.getThumbnailUrl());
+                post.setThumbnailUrl(thumbnailUrl);
+            }
+
+            if (post.getContentImages() != null) {
+                Set<String> contentImages = new HashSet<>();
+                for (String imageUrl : post.getContentImages()) {
+                    contentImages.add(presignedUrl.createPresignedGetUrl(bucketName, imageUrl));
+                }
+                post.setContentImages(contentImages);
+            }
+        }
+
+        return Optional.ofNullable(post);
     }
 
     @Override

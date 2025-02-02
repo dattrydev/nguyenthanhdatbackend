@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, UUID> {
-    Optional<Post> findBySlug(String slug);
+    Post findBySlug(String slug);
 }

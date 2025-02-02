@@ -24,7 +24,6 @@ public class Tag {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "tags")
     private Set<Post> posts;
 
