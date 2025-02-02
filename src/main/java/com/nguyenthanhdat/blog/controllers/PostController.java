@@ -7,6 +7,7 @@ import com.nguyenthanhdat.blog.services.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +35,11 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        return ResponseEntity.ok(postService.createPost(post));
+    public ResponseEntity<Post> createPost(
+            @RequestPart("post") Post post,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
+            @RequestPart(value = "contentImages", required = false) List<MultipartFile> contentImages
+    ) {
+        return ResponseEntity.ok(postService.createPost(post, thumbnail, contentImages));
     }
 }

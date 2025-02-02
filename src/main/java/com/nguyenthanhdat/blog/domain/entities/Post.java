@@ -53,6 +53,14 @@ public class Post {
     )
     private Set<Tag> tags = new HashSet<>();
 
+    @Column(nullable = true)
+    private String thumbnailUrl;
+
+    @ElementCollection
+    @CollectionTable(name = "post_content_images", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "image_url")
+    private Set<String> contentImages = new HashSet<>();
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
