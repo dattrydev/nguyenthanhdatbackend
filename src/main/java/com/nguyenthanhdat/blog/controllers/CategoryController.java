@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.controllers;
 
-import com.nguyenthanhdat.blog.domain.dtos.category.CategoryDto;
-import com.nguyenthanhdat.blog.domain.dtos.category.CreateCategoryRequest;
+import com.nguyenthanhdat.blog.domain.dtos.category.CategoryListDto;
+import com.nguyenthanhdat.blog.domain.dtos.category.CreateCategoryDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.mappers.CategoryMapper;
 import com.nguyenthanhdat.blog.services.CategoryService;
@@ -22,8 +22,8 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> getAllCategories() {
-        List<CategoryDto> categories = categoryService.listCategories()
+    public ResponseEntity<List<CategoryListDto>> getAllCategories() {
+        List<CategoryListDto> categories = categoryService.listCategories()
                 .stream().map(categoryMapper::toDto)
                 .toList();
 
@@ -31,8 +31,8 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CreateCategoryRequest createCategoryRequest) {
-    Category categoryToCreate = categoryMapper.toEntity(createCategoryRequest);
+    public ResponseEntity<CategoryListDto> createCategory(@Valid @RequestBody CreateCategoryDto createCategoryDto) {
+    Category categoryToCreate = categoryMapper.toEntity(createCategoryDto);
     Category savedCategory = categoryService.createCategory(categoryToCreate);
         return new ResponseEntity<>(
             categoryMapper.toDto(savedCategory),
@@ -41,7 +41,7 @@ public class CategoryController {
     }
 
     @PatchMapping
-    public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody Category category) {
+    public ResponseEntity<CategoryListDto> updateCategory(@Valid @RequestBody Category category) {
         Category categoryToUpdate = categoryService.updateCategory(category);
         return new ResponseEntity<>(
             categoryMapper.toDto(categoryToUpdate),

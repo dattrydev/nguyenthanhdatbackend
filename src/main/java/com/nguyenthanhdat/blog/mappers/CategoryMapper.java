@@ -1,8 +1,8 @@
 package com.nguyenthanhdat.blog.mappers;
 
 import com.nguyenthanhdat.blog.domain.PostStatus;
-import com.nguyenthanhdat.blog.domain.dtos.category.CategoryDto;
-import com.nguyenthanhdat.blog.domain.dtos.category.CreateCategoryRequest;
+import com.nguyenthanhdat.blog.domain.dtos.category.CategoryListDto;
+import com.nguyenthanhdat.blog.domain.dtos.category.CreateCategoryDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import org.mapstruct.Mapper;
@@ -15,9 +15,9 @@ import java.util.List;
 public interface CategoryMapper {
 
     @Mapping(target="postCount", source = "posts", qualifiedByName = "caculatePostCount")
-    CategoryDto toDto(Category category);
+    CategoryListDto toDto(Category category);
 
-    Category toEntity(CreateCategoryRequest createCategoryRequest);
+    Category toEntity(CreateCategoryDto createCategoryDto);
 
     @Named("caculatePostCount")
     default long caculatePostCount(List<Post> posts){

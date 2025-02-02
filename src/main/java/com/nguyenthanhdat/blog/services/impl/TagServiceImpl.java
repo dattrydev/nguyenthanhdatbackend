@@ -1,6 +1,6 @@
 package com.nguyenthanhdat.blog.services.impl;
 
-import com.nguyenthanhdat.blog.domain.dtos.tag.TagDto;
+import com.nguyenthanhdat.blog.domain.dtos.tag.TagListDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
 import com.nguyenthanhdat.blog.mappers.TagMapper;
 import com.nguyenthanhdat.blog.repositories.TagRepository;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +23,7 @@ public class TagServiceImpl implements TagService {
         return tagRepository.findAll();
     }
 
-    public Optional<TagDto> getTagByName(String name) {
+    public Optional<TagListDto> getTagByName(String name) {
         Optional<Tag> tag = tagRepository.findByName(name);
         return tag.map(tagMapper::toDto);
     }

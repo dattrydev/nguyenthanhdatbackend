@@ -1,11 +1,10 @@
 package com.nguyenthanhdat.blog.controllers;
 
 import com.nguyenthanhdat.blog.domain.dtos.tag.CreateTagRequest;
-import com.nguyenthanhdat.blog.domain.dtos.tag.TagDto;
+import com.nguyenthanhdat.blog.domain.dtos.tag.TagListDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
 import com.nguyenthanhdat.blog.mappers.TagMapper;
 import com.nguyenthanhdat.blog.services.TagService;
-import com.nguyenthanhdat.blog.services.impl.TagServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,8 +22,8 @@ public class TagController {
     private final TagMapper tagMapper;
 
     @GetMapping
-    public ResponseEntity<List<TagDto>> getAllTags() {
-        List<TagDto> tags = tagService.listTags()
+    public ResponseEntity<List<TagListDto>> getAllTags() {
+        List<TagListDto> tags = tagService.listTags()
                 .stream().map(tagMapper::toDto)
                 .toList();
 
@@ -32,14 +31,14 @@ public class TagController {
     }
 
     @GetMapping(params = "name")
-    public ResponseEntity<TagDto> getTagByName(@RequestParam(name = "name") String name) {
-        Optional<TagDto> tag = tagService.getTagByName(name);
+    public ResponseEntity<TagListDto> getTagByName(@RequestParam(name = "name") String name) {
+        Optional<TagListDto> tag = tagService.getTagByName(name);
         return tag.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<TagDto> createTag(@Valid @RequestBody CreateTagRequest createTagRequest) {
+    public ResponseEntity<TagListDto> createTag(@Valid @RequestBody CreateTagRequest createTagRequest) {
         Tag tagToCreate = tagMapper.toEntity(createTagRequest);
         Tag savedTag = tagService.createTag(tagToCreate);
         return new ResponseEntity<>(
@@ -49,7 +48,7 @@ public class TagController {
     }
 
     @PatchMapping
-    public ResponseEntity<TagDto> updateTag(@Valid @RequestBody Tag tag) {
+    public ResponseEntity<TagListDto> updateTag(@Valid @RequestBody Tag tag) {
         Tag updatedTag = tagService.updateTag(tag);
         return ResponseEntity.ok(tagMapper.toDto(updatedTag));
     }
