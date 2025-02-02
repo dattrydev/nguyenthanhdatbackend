@@ -1,6 +1,6 @@
 package com.nguyenthanhdat.blog.mappers;
 
-import com.nguyenthanhdat.blog.domain.dtos.tag.CreateTagRequest;
+import com.nguyenthanhdat.blog.domain.dtos.tag.CreateTagDto;
 import com.nguyenthanhdat.blog.domain.dtos.tag.TagListDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public interface TagMapper {
     TagListDto toDto(Tag tag);
 
-    Tag toEntity(CreateTagRequest createTagRequest);
+    Tag toEntity(CreateTagDto createTagDto);
 
     List<TagListDto> toDtoList(List<Tag> tags);
 }

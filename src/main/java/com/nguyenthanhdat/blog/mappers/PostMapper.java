@@ -1,5 +1,6 @@
 package com.nguyenthanhdat.blog.mappers;
 
+import com.nguyenthanhdat.blog.domain.dtos.post.CreatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.post.PostListDto;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import org.mapstruct.Mapper;

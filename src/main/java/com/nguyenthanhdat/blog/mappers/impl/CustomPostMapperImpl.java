@@ -1,9 +1,12 @@
 package com.nguyenthanhdat.blog.mappers.impl;
 
 import com.nguyenthanhdat.blog.domain.dtos.category.CategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.post.CreatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.post.PostListDto;
 import com.nguyenthanhdat.blog.domain.dtos.tag.TagDto;
+import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
+import com.nguyenthanhdat.blog.domain.entities.Tag;
 import com.nguyenthanhdat.blog.mappers.PostMapper;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -25,6 +28,7 @@ public class CustomPostMapperImpl implements PostMapper {
                 .tags(post.getTags().stream()
                         .map(tag -> new TagDto(tag.getId(), tag.getName()))
                         .collect(Collectors.toSet()))
+                .thumbnailUrl(post.getThumbnailUrl())
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 package com.nguyenthanhdat.blog.controllers;
 
-import com.nguyenthanhdat.blog.domain.dtos.tag.CreateTagRequest;
+import com.nguyenthanhdat.blog.domain.dtos.tag.CreateTagDto;
 import com.nguyenthanhdat.blog.domain.dtos.tag.TagListDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
 import com.nguyenthanhdat.blog.mappers.TagMapper;
@@ -38,8 +38,8 @@ public class TagController {
     }
 
     @PostMapping
-    public ResponseEntity<TagListDto> createTag(@Valid @RequestBody CreateTagRequest createTagRequest) {
-        Tag tagToCreate = tagMapper.toEntity(createTagRequest);
+    public ResponseEntity<TagListDto> createTag(@Valid @RequestBody CreateTagDto createTagDto) {
+        Tag tagToCreate = tagMapper.toEntity(createTagDto);
         Tag savedTag = tagService.createTag(tagToCreate);
         return new ResponseEntity<>(
                 tagMapper.toDto(savedTag),
