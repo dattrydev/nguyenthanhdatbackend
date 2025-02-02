@@ -1,9 +1,14 @@
 package com.nguyenthanhdat.blog.domain.dtos.post;
 
+import com.nguyenthanhdat.blog.domain.PostStatus;
+import com.nguyenthanhdat.blog.domain.dtos.category.CategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.tag.TagDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Data
 @Builder
@@ -12,10 +17,11 @@ import lombok.NoArgsConstructor;
 public class PostDto {
     private String title;
     private String content;
-    private String thumbnailUrl;
-    private String slug;
-    private String category;
-    private String tags;
-    private String status;
+    private PostStatus status;
     private Integer readingTime;
+    private String slug;
+    private CategoryDto category;
+    private Set<TagDto> tags;
+    private String thumbnailUrl;
+    private Set<String> contentImages;
 }

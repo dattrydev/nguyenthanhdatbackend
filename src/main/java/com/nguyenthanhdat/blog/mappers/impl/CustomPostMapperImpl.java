@@ -2,6 +2,7 @@ package com.nguyenthanhdat.blog.mappers.impl;
 
 import com.nguyenthanhdat.blog.domain.dtos.category.CategoryDto;
 import com.nguyenthanhdat.blog.domain.dtos.post.CreatePostDto;
+import com.nguyenthanhdat.blog.domain.dtos.post.PostDto;
 import com.nguyenthanhdat.blog.domain.dtos.post.PostListDto;
 import com.nguyenthanhdat.blog.domain.dtos.tag.TagDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
@@ -17,7 +18,29 @@ import java.util.stream.Collectors;
 @Component
 public class CustomPostMapperImpl implements PostMapper {
     @Override
-    public PostListDto toDto(Post post) {
+    public PostDto toDto(Post post) {
+        return PostDto.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .status(post.getStatus())
+                .readingTime(post.getReadingTime())
+                .slug(post.getSlug())
+                .category(CategoryDto.builder()
+                        .id(post.getCategory().getId())
+                        .name(post.getCategory().getName())
+                        .build())
+                .tags(post.getTags().stream()
+                        .map(tag -> TagDto.builder()
+                                .id(tag.getId())
+                                .name(tag.getName())
+                                .build())
+                        .collect(Collectors.toSet()))
+                .thumbnailUrl(post.getThumbnailUrl())
+                .contentImages(post.getContentImages())
+                .build();    }
+
+    @Override
+    public PostListDto toListDto(Post post) {
         return PostListDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())

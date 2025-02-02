@@ -1,6 +1,7 @@
 package com.nguyenthanhdat.blog.controllers;
 
 import com.nguyenthanhdat.blog.domain.dtos.post.CreatePostDto;
+import com.nguyenthanhdat.blog.domain.dtos.post.PostDto;
 import com.nguyenthanhdat.blog.domain.dtos.post.PostListDto;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.mappers.PostMapper;
@@ -24,12 +25,12 @@ public class PostController {
     public List<PostListDto> getAllPosts() {
         return postService.getAllPosts()
                 .stream()
-                .map(postMapper::toDto)
+                .map(postMapper::toListDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<Post> getPostBySlug(@PathVariable String slug) {
+    public ResponseEntity<PostDto> getPostBySlug(@PathVariable String slug) {
         return postService.getPostBySlug(slug)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

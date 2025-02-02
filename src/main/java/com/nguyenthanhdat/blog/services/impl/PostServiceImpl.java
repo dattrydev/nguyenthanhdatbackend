@@ -1,9 +1,11 @@
 package com.nguyenthanhdat.blog.services.impl;
 
 import com.nguyenthanhdat.blog.domain.dtos.post.CreatePostDto;
+import com.nguyenthanhdat.blog.domain.dtos.post.PostDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
+import com.nguyenthanhdat.blog.mappers.PostMapper;
 import com.nguyenthanhdat.blog.repositories.CategoryRepository;
 import com.nguyenthanhdat.blog.repositories.PostRepository;
 import com.nguyenthanhdat.blog.repositories.TagRepository;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
+    private final PostMapper postMapper;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final FileStorageService fileStorageService;
@@ -49,7 +52,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Optional<Post> getPostBySlug(String slug) {
+    public Optional<PostDto> getPostBySlug(String slug) {
         Post post = postRepository.findBySlug(slug);
         if (post != null) {
             if (post.getThumbnailUrl() != null) {
@@ -66,7 +69,8 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        return Optional.ofNullable(post);
+        return Optional.ofNullable(post)
+                .map(postMapper::toDto);
     }
 
     @Override

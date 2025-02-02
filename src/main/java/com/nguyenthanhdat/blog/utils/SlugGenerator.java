@@ -10,12 +10,11 @@ public class SlugGenerator {
             return "";
         }
 
-        // Chuẩn hóa Unicode (loại bỏ dấu tiếng Việt)
         String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
-        String slug = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "") // Xóa dấu
-                .replaceAll("[^\\w\\s]", "")  // Xóa ký tự đặc biệt
-                .replaceAll("\\s+", "-")      // Thay khoảng trắng bằng dấu '-'
-                .toLowerCase(Locale.ENGLISH); // Chuyển về chữ thường
+        String slug = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replaceAll("[^\\w\\s]", "")
+                .replaceAll("\\s+", "-")
+                .toLowerCase(Locale.ENGLISH);
         return slug;
     }
 }
