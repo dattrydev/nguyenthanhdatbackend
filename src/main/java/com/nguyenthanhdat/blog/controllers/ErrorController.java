@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @ControllerAdvice
 @Slf4j
 public class ErrorController {
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleException(Exception e){
+    public static ResponseEntity<ApiErrorResponse> handleException(Exception e){
         log.error("Error occurred: ", e);
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -25,18 +27,32 @@ public class ErrorController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(IllegalArgumentException e){
+    public static ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         log.error("Error occurred: ", e);
+
+        String field = "unknown";
+        if (e.getMessage().toLowerCase().contains("email")) {
+            field = "email";
+        } else if (e.getMessage().toLowerCase().contains("password")) {
+            field = "password";
+        }
+
+        ApiErrorResponse.FieldError fieldError = ApiErrorResponse.FieldError.builder()
+                .field(field)
+                .message(e.getMessage())
+                .build();
+
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
+                .errors(List.of(fieldError))
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ApiErrorResponse> handleIllegalStateException(IllegalStateException e){
+    public static ResponseEntity<ApiErrorResponse> handleIllegalStateException(IllegalStateException e){
         log.error("Error occurred: ", e);
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .status(HttpStatus.CONFLICT.value())
@@ -47,7 +63,7 @@ public class ErrorController {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiErrorResponse> handleBadCredentialsException(BadCredentialsException e){
+    public static ResponseEntity<ApiErrorResponse> handleBadCredentialsException(BadCredentialsException e){
         log.error("Error occurred: ", e);
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .status(HttpStatus.UNAUTHORIZED.value())
