@@ -1,11 +1,7 @@
 package com.nguyenthanhdat.blog.domain.dtos.dashboard.post;
 
 import com.nguyenthanhdat.blog.domain.PostStatus;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CategoryDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.TagDto;
 import lombok.*;
-
-import java.util.Set;
 
 @Data
 @NoArgsConstructor

@@ -39,4 +39,8 @@ public class S3FileStorageServiceImpl implements FileStorageService {
         return fileKey;
     }
 
+    @Override
+    public void deleteFile(String fileUrl) {
+        s3Client.deleteObject(builder -> builder.bucket(bucketName).key(fileUrl));
+    }
 }

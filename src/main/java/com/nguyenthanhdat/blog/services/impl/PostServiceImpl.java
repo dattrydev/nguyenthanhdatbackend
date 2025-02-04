@@ -3,6 +3,7 @@ package com.nguyenthanhdat.blog.services.impl;
 import com.nguyenthanhdat.blog.domain.PostStatus;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.CreatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.PostDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
@@ -67,7 +68,7 @@ public class PostServiceImpl implements PostService {
         Page<Post> postPage = postRepository.findAll(specification, pageable);
 
         List<DashboardPostListDto> postDtos = postPage.stream()
-                .map(dashboardPostMapper::toListDto)
+                .map(dashboardPostMapper::toDashboardPostListDto)
                 .collect(Collectors.toList());
 
         long totalRecords = postRepository.count(specification);
@@ -147,6 +148,66 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post createPostWithoutImage(Post post) {
         return postRepository.save(post);
+    }
+
+    @Override
+    public DashboardUpdatePostDto updatePost(String slug, DashboardUpdatePostDto dashboardUpdatePostDto, MultipartFile newThumbnail,
+                           List<MultipartFile> newContentImages, String oldThumbnail,
+                           List<String> oldContentImages) {
+        Post post = postRepository.findBySlug(slug);
+        if (post == null) {
+            throw new RuntimeException("Post not found");
+        }
+
+        post.setTitle(dashboardUpdatePostDto.getTitle());
+        post.setContent(dashboardUpdatePostDto.getContent());
+        post.setReadingTime(dashboardUpdatePostDto.getReadingTime());
+        post.setStatus(dashboardUpdatePostDto.getStatus());
+
+        Category category = categoryRepository.findById(dashboardUpdatePostDto.getCategory_id())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        post.setCategory(category);
+
+        Set<Tag> tags = dashboardUpdatePostDto.getTag_ids().stream()
+                .map(tag_id -> tagRepository.findById(tag_id)
+                        .orElseThrow(() -> new RuntimeException("Tag not found")))
+                .collect(Collectors.toSet());
+        post.setTags(tags);
+
+        if (newThumbnail != null && !newThumbnail.isEmpty()) {
+            if (post.getThumbnailUrl() != null && !post.getThumbnailUrl().equals(oldThumbnail)) {
+                fileStorageService.deleteFile(post.getThumbnailUrl());
+            }
+            String thumbnailUrl = fileStorageService.uploadFile(newThumbnail);
+            post.setThumbnailUrl(thumbnailUrl);
+        } else {
+            post.setThumbnailUrl(oldThumbnail);
+        }
+
+        Set<String> newImageUrls = new HashSet<>();
+        if (newContentImages != null && !newContentImages.isEmpty()) {
+            for (MultipartFile image : newContentImages) {
+                if (!image.isEmpty()) {
+                    newImageUrls.add(fileStorageService.uploadFile(image));
+                }
+            }
+        }
+
+        if (oldContentImages != null) {
+            newImageUrls.addAll(oldContentImages);
+        }
+
+        Set<String> imagesToDelete = new HashSet<>(post.getContentImages());
+        imagesToDelete.removeAll(newImageUrls);
+        for (String oldImageUrl : imagesToDelete) {
+            fileStorageService.deleteFile(oldImageUrl);
+        }
+
+        post.setContentImages(newImageUrls);
+
+        postRepository.save(post);
+
+        return dashboardPostMapper.toDashboardUpdatePostDto(post);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.controllers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.CreatePostDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.PostDto;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
@@ -13,14 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/dashboard/v1/posts")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final DashboardPostMapper dashboardPostMapper;
 
     @GetMapping
     public Map<String, Object> getFilteredPosts(
@@ -50,4 +48,18 @@ public class PostController {
         Post savedPost = postService.createPost(createPostDto, thumbnail, contentImages);
         return ResponseEntity.ok(savedPost);
     }
+
+    @PatchMapping("/{slug}")
+    public ResponseEntity<DashboardUpdatePostDto> updatePost(
+            @PathVariable String slug,
+            @ModelAttribute DashboardUpdatePostDto postDto,
+            @RequestParam(value = "newThumbnail", required = false) MultipartFile newThumbnail,
+            @RequestParam(value = "newContentImages", required = false) List<MultipartFile> newContentImages,
+            @RequestParam(value = "oldThumbnail", required = false) String oldThumbnail,
+            @RequestParam(value = "oldContentImages", required = false) List<String> oldContentImages
+    ) {
+        DashboardUpdatePostDto updatedPost = postService.updatePost(slug, postDto, newThumbnail, newContentImages, oldThumbnail, oldContentImages);
+        return ResponseEntity.ok(updatedPost);
+    }
+
 }

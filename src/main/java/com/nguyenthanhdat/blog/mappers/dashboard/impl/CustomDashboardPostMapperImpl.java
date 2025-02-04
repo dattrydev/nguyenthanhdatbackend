@@ -2,6 +2,7 @@ package com.nguyenthanhdat.blog.mappers.dashboard.impl;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CategoryDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.PostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.TagDto;
 import com.nguyenthanhdat.blog.domain.entities.Post;
@@ -37,7 +38,7 @@ public class CustomDashboardPostMapperImpl implements DashboardPostMapper {
                 .build();    }
 
     @Override
-    public DashboardPostListDto toListDto(Post post) {
+    public DashboardPostListDto toDashboardPostListDto(Post post) {
         return DashboardPostListDto.builder()
                 .title(post.getTitle())
                 .status(post.getStatus())
@@ -46,6 +47,23 @@ public class CustomDashboardPostMapperImpl implements DashboardPostMapper {
                 .tags_name(post.getTags().stream()
                         .map(tag -> tag.getName())
                         .collect(Collectors.joining(", ")))
+                .build();
+    }
+
+    @Override
+    public DashboardUpdatePostDto toDashboardUpdatePostDto(Post post) {
+        return DashboardUpdatePostDto.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .status(post.getStatus())
+                .readingTime(post.getReadingTime())
+                .slug(post.getSlug())
+                .category_id(post.getCategory().getId())
+                .tag_ids(post.getTags().stream()
+                        .map(tag -> tag.getId())
+                        .collect(Collectors.toSet()))
+                .thumbnailUrl(post.getThumbnailUrl())
+                .contentImages(post.getContentImages())
                 .build();
     }
 }
