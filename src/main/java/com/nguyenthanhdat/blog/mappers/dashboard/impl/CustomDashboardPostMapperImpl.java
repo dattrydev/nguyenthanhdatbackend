@@ -1,14 +1,11 @@
-package com.nguyenthanhdat.blog.mappers.impl;
+package com.nguyenthanhdat.blog.mappers.dashboard.impl;
 
-import com.nguyenthanhdat.blog.domain.dtos.category.CategoryDto;
-import com.nguyenthanhdat.blog.domain.dtos.post.CreatePostDto;
-import com.nguyenthanhdat.blog.domain.dtos.post.PostDto;
-import com.nguyenthanhdat.blog.domain.dtos.post.PostListDto;
-import com.nguyenthanhdat.blog.domain.dtos.tag.TagDto;
-import com.nguyenthanhdat.blog.domain.entities.Category;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.PostDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.TagDto;
 import com.nguyenthanhdat.blog.domain.entities.Post;
-import com.nguyenthanhdat.blog.domain.entities.Tag;
-import com.nguyenthanhdat.blog.mappers.PostMapper;
+import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Primary
 @Component
-public class CustomPostMapperImpl implements PostMapper {
+public class CustomDashboardPostMapperImpl implements DashboardPostMapper {
     @Override
     public PostDto toDto(Post post) {
         return PostDto.builder()
@@ -40,24 +37,15 @@ public class CustomPostMapperImpl implements PostMapper {
                 .build();    }
 
     @Override
-    public PostListDto toListDto(Post post) {
-        return PostListDto.builder()
+    public DashboardPostListDto toListDto(Post post) {
+        return DashboardPostListDto.builder()
                 .title(post.getTitle())
-                .content(post.getContent())
                 .status(post.getStatus())
-                .readingTime(post.getReadingTime())
                 .slug(post.getSlug())
-                .category(CategoryDto.builder()
-                        .id(post.getCategory().getId())
-                        .name(post.getCategory().getName())
-                        .build())
-                .tags(post.getTags().stream()
-                        .map(tag -> TagDto.builder()
-                                .id(tag.getId())
-                                .name(tag.getName())
-                                .build())
-                        .collect(Collectors.toSet()))
-                .thumbnailUrl(post.getThumbnailUrl())
+                .category_name(post.getCategory().getName())
+                .tags_name(post.getTags().stream()
+                        .map(tag -> tag.getName())
+                        .collect(Collectors.joining(", ")))
                 .build();
     }
 }

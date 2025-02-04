@@ -1,4 +1,4 @@
-package com.nguyenthanhdat.blog.domain.dtos.tag;
+package com.nguyenthanhdat.blog.domain.dtos.dashboard.tag;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

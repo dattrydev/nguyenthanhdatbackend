@@ -1,10 +1,10 @@
-package com.nguyenthanhdat.blog.controllers;
+package com.nguyenthanhdat.blog.controllers.dashboard;
 
-import com.nguyenthanhdat.blog.domain.dtos.post.CreatePostDto;
-import com.nguyenthanhdat.blog.domain.dtos.post.PostDto;
-import com.nguyenthanhdat.blog.domain.dtos.post.PostListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.CreatePostDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.PostDto;
 import com.nguyenthanhdat.blog.domain.entities.Post;
-import com.nguyenthanhdat.blog.mappers.PostMapper;
+import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
 import com.nguyenthanhdat.blog.services.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,21 +12,26 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/posts")
+@RequestMapping("/api/dashboard/v1/posts")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final PostMapper postMapper;
+    private final DashboardPostMapper dashboardPostMapper;
 
     @GetMapping
-    public List<PostListDto> getAllPosts() {
-        return postService.getAllPosts()
-                .stream()
-                .map(postMapper::toListDto)
-                .collect(Collectors.toList());
+    public Map<String, Object> getFilteredPosts(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Integer readingTime,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return postService.getAllDashboardPosts(title, status, readingTime, category, page, size);
     }
 
     @GetMapping("/{slug}")

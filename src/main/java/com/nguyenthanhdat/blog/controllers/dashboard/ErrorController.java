@@ -1,6 +1,6 @@
-package com.nguyenthanhdat.blog.controllers;
+package com.nguyenthanhdat.blog.controllers.dashboard;
 
-import com.nguyenthanhdat.blog.domain.dtos.ApiErrorResponse;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.ApiErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

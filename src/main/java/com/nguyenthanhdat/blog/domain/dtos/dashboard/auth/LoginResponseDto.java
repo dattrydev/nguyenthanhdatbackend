@@ -1,6 +1,6 @@
-package com.nguyenthanhdat.blog.domain.dtos.auth;
+package com.nguyenthanhdat.blog.domain.dtos.dashboard.auth;
 
-import com.nguyenthanhdat.blog.domain.dtos.user.UserDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.user.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

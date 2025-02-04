@@ -1,9 +1,9 @@
-package com.nguyenthanhdat.blog.controllers;
+package com.nguyenthanhdat.blog.controllers.dashboard;
 
-import com.nguyenthanhdat.blog.domain.dtos.category.CategoryListDto;
-import com.nguyenthanhdat.blog.domain.dtos.category.CreateCategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CategoryListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CreateCategoryDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
-import com.nguyenthanhdat.blog.mappers.CategoryMapper;
+import com.nguyenthanhdat.blog.mappers.dashboard.DashboardCategoryMapper;
 import com.nguyenthanhdat.blog.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,16 +15,16 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping("/api/dashboard/v1/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
-    private final CategoryMapper categoryMapper;
+    private final DashboardCategoryMapper dashboardCategoryMapper;
     @GetMapping
     public ResponseEntity<List<CategoryListDto>> getAllCategories() {
         List<CategoryListDto> categories = categoryService.listCategories()
-                .stream().map(categoryMapper::toDto)
+                .stream().map(dashboardCategoryMapper::toDto)
                 .toList();
 
         return ResponseEntity.ok(categories);
@@ -32,10 +32,10 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryListDto> createCategory(@Valid @RequestBody CreateCategoryDto createCategoryDto) {
-    Category categoryToCreate = categoryMapper.toEntity(createCategoryDto);
+    Category categoryToCreate = dashboardCategoryMapper.toEntity(createCategoryDto);
     Category savedCategory = categoryService.createCategory(categoryToCreate);
         return new ResponseEntity<>(
-            categoryMapper.toDto(savedCategory),
+            dashboardCategoryMapper.toDto(savedCategory),
             HttpStatus.CREATED
     );
     }
@@ -44,7 +44,7 @@ public class CategoryController {
     public ResponseEntity<CategoryListDto> updateCategory(@Valid @RequestBody Category category) {
         Category categoryToUpdate = categoryService.updateCategory(category);
         return new ResponseEntity<>(
-            categoryMapper.toDto(categoryToUpdate),
+            dashboardCategoryMapper.toDto(categoryToUpdate),
             HttpStatus.OK
         );
     }

@@ -1,8 +1,6 @@
-package com.nguyenthanhdat.blog.domain.dtos.post;
+package com.nguyenthanhdat.blog.domain.dtos.dashboard.post;
 
 import com.nguyenthanhdat.blog.domain.PostStatus;
-import com.nguyenthanhdat.blog.domain.dtos.category.CategoryDto;
-import com.nguyenthanhdat.blog.domain.dtos.tag.TagDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

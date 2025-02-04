@@ -1,17 +1,15 @@
-package com.nguyenthanhdat.blog.domain.dtos.category;
+package com.nguyenthanhdat.blog.domain.dtos.dashboard.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryDto {
-    private UUID id;
+public class UserDto {
+    private String email;
     private String name;
 }

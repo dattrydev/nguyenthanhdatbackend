@@ -1,8 +1,8 @@
 package com.nguyenthanhdat.blog.services.impl;
 
-import com.nguyenthanhdat.blog.domain.dtos.tag.TagListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.TagListDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
-import com.nguyenthanhdat.blog.mappers.TagMapper;
+import com.nguyenthanhdat.blog.mappers.dashboard.DashboardTagMapper;
 import com.nguyenthanhdat.blog.repositories.TagRepository;
 import com.nguyenthanhdat.blog.services.TagService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.Optional;
 public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
-    private final TagMapper tagMapper;
+    private final DashboardTagMapper dashboardTagMapper;
 
     @Override
     public List<Tag> listTags() {
@@ -25,7 +25,7 @@ public class TagServiceImpl implements TagService {
 
     public Optional<TagListDto> getTagByName(String name) {
         Optional<Tag> tag = tagRepository.findByName(name);
-        return tag.map(tagMapper::toDto);
+        return tag.map(dashboardTagMapper::toDto);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.nguyenthanhdat.blog.services;
 
-import com.nguyenthanhdat.blog.domain.dtos.tag.TagListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.TagListDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
 
 import java.util.List;

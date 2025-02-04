@@ -1,4 +1,4 @@
-package com.nguyenthanhdat.blog.domain.dtos.tag;
+package com.nguyenthanhdat.blog.domain.dtos.dashboard.tag;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

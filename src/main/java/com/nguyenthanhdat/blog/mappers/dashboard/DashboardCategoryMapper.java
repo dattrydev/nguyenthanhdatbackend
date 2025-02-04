@@ -1,8 +1,8 @@
-package com.nguyenthanhdat.blog.mappers;
+package com.nguyenthanhdat.blog.mappers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.PostStatus;
-import com.nguyenthanhdat.blog.domain.dtos.category.CategoryListDto;
-import com.nguyenthanhdat.blog.domain.dtos.category.CreateCategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CategoryListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CreateCategoryDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import org.mapstruct.Mapper;
@@ -12,7 +12,7 @@ import org.mapstruct.Named;
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
-public interface CategoryMapper {
+public interface DashboardCategoryMapper {
 
     @Mapping(target="postCount", source = "posts", qualifiedByName = "caculatePostCount")
     CategoryListDto toDto(Category category);

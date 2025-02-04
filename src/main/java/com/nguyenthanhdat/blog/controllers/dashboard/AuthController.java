@@ -1,22 +1,21 @@
-package com.nguyenthanhdat.blog.controllers;
+package com.nguyenthanhdat.blog.controllers.dashboard;
 
-import com.nguyenthanhdat.blog.domain.dtos.auth.LoginResponseDto;
-import com.nguyenthanhdat.blog.domain.dtos.LoginRequest;
-import com.nguyenthanhdat.blog.domain.dtos.user.UserDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.LoginResponseDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.LoginRequest;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.user.UserDto;
 import com.nguyenthanhdat.blog.domain.entities.User;
 import com.nguyenthanhdat.blog.services.AuthenticationService;
 import com.nguyenthanhdat.blog.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/api/v1/auth")
+@RequestMapping(path = "/api/dashboard/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationService authenticationService;

@@ -1,9 +1,9 @@
-package com.nguyenthanhdat.blog.controllers;
+package com.nguyenthanhdat.blog.controllers.dashboard;
 
-import com.nguyenthanhdat.blog.domain.dtos.tag.CreateTagDto;
-import com.nguyenthanhdat.blog.domain.dtos.tag.TagListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.CreateTagDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.TagListDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
-import com.nguyenthanhdat.blog.mappers.TagMapper;
+import com.nguyenthanhdat.blog.mappers.dashboard.DashboardTagMapper;
 import com.nguyenthanhdat.blog.services.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,16 +15,16 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/tags")
+@RequestMapping("/api/dashboard/v1/tags")
 @RequiredArgsConstructor
 public class TagController {
     private final TagService tagService;
-    private final TagMapper tagMapper;
+    private final DashboardTagMapper dashboardTagMapper;
 
     @GetMapping
     public ResponseEntity<List<TagListDto>> getAllTags() {
         List<TagListDto> tags = tagService.listTags()
-                .stream().map(tagMapper::toDto)
+                .stream().map(dashboardTagMapper::toDto)
                 .toList();
 
         return ResponseEntity.ok(tags);
@@ -39,10 +39,10 @@ public class TagController {
 
     @PostMapping
     public ResponseEntity<TagListDto> createTag(@Valid @RequestBody CreateTagDto createTagDto) {
-        Tag tagToCreate = tagMapper.toEntity(createTagDto);
+        Tag tagToCreate = dashboardTagMapper.toEntity(createTagDto);
         Tag savedTag = tagService.createTag(tagToCreate);
         return new ResponseEntity<>(
-                tagMapper.toDto(savedTag),
+                dashboardTagMapper.toDto(savedTag),
                 HttpStatus.CREATED
         );
     }
@@ -50,7 +50,7 @@ public class TagController {
     @PatchMapping
     public ResponseEntity<TagListDto> updateTag(@Valid @RequestBody Tag tag) {
         Tag updatedTag = tagService.updateTag(tag);
-        return ResponseEntity.ok(tagMapper.toDto(updatedTag));
+        return ResponseEntity.ok(dashboardTagMapper.toDto(updatedTag));
     }
 
 

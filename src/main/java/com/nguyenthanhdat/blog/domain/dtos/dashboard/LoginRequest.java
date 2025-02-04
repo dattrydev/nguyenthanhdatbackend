@@ -1,4 +1,4 @@
-package com.nguyenthanhdat.blog.domain.dtos;
+package com.nguyenthanhdat.blog.domain.dtos.dashboard;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

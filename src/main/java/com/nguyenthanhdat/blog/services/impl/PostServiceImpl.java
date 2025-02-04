@@ -1,26 +1,30 @@
 package com.nguyenthanhdat.blog.services.impl;
 
-import com.nguyenthanhdat.blog.domain.dtos.post.CreatePostDto;
-import com.nguyenthanhdat.blog.domain.dtos.post.PostDto;
+import com.nguyenthanhdat.blog.domain.PostStatus;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.CreatePostDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.PostDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
-import com.nguyenthanhdat.blog.mappers.PostMapper;
+import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
 import com.nguyenthanhdat.blog.repositories.CategoryRepository;
 import com.nguyenthanhdat.blog.repositories.PostRepository;
 import com.nguyenthanhdat.blog.repositories.TagRepository;
 import com.nguyenthanhdat.blog.services.FileStorageService;
 import com.nguyenthanhdat.blog.services.PostService;
+import com.nguyenthanhdat.blog.specification.PostSpecification;
 import com.nguyenthanhdat.blog.utils.PresignedUrl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -28,7 +32,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
-    private final PostMapper postMapper;
+    private final DashboardPostMapper dashboardPostMapper;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final FileStorageService fileStorageService;
@@ -52,6 +56,34 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Map<String, Object> getAllDashboardPosts(String title, String status, Integer readingTime, String category, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Specification<Post> specification = Specification.where(PostSpecification.hasStatus(status != null ? PostStatus.valueOf(status) : null))
+                .and(PostSpecification.hasTitle(title))
+                .and(PostSpecification.hasReadingTime(readingTime))
+                .and(PostSpecification.hasCategory(category));
+
+        Page<Post> postPage = postRepository.findAll(specification, pageable);
+
+        List<DashboardPostListDto> postDtos = postPage.stream()
+                .map(dashboardPostMapper::toListDto)
+                .collect(Collectors.toList());
+
+        long totalRecords = postRepository.count(specification);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("posts", postDtos);
+        response.put("totalRecords", totalRecords);
+        response.put("totalPages", postPage.getTotalPages());
+        response.put("currentPage", page);
+
+        return response;
+    }
+
+
+
+    @Override
     public Optional<PostDto> getPostBySlug(String slug) {
         Post post = postRepository.findBySlug(slug);
         if (post != null) {
@@ -70,7 +102,7 @@ public class PostServiceImpl implements PostService {
         }
 
         return Optional.ofNullable(post)
-                .map(postMapper::toDto);
+                .map(dashboardPostMapper::toDto);
     }
 
     @Override
