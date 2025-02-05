@@ -2,6 +2,7 @@ package com.nguyenthanhdat.blog.controllers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardCreatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListPagingDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
 import com.nguyenthanhdat.blog.exceptions.dashboard.post.PostNotFoundException;
 import com.nguyenthanhdat.blog.services.PostService;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/dashboard/v1/posts")
@@ -21,7 +22,7 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getPostList(
+    public ResponseEntity<DashboardPostListPagingDto> getPostList(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Integer readingTime,
@@ -29,14 +30,10 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Map<String, Object> response = postService.getDashboardPostList(title, status, readingTime, category, page, size);
+        Optional<DashboardPostListPagingDto> response = postService.getDashboardPostList(title, status, readingTime, category, page, size);
 
-        if (response.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "No posts found"));
-        }
-
-        return ResponseEntity.ok().body(response);
+        return response.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).build());
     }
 
     @GetMapping("/{slug}")
@@ -52,8 +49,9 @@ public class PostController {
             @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestParam(value = "contentImages", required = false) List<MultipartFile> contentImages
     ) {
-        DashboardPostDto savedPost = postService.createPost(dashboardCreatePostDto, thumbnail, contentImages);
-        return ResponseEntity.ok(savedPost);
+        Optional<DashboardPostDto> savedPost = postService.createPost(dashboardCreatePostDto, thumbnail, contentImages);
+        return savedPost.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
     @PatchMapping("/{slug}")
@@ -65,8 +63,9 @@ public class PostController {
             @RequestParam(value = "oldThumbnail", required = false) String oldThumbnail,
             @RequestParam(value = "oldContentImages", required = false) List<String> oldContentImages
     ) {
-        DashboardUpdatePostDto updatedPost = postService.updatePost(slug, postDto, newThumbnail, newContentImages, oldThumbnail, oldContentImages);
-        return ResponseEntity.ok(updatedPost);
+        Optional<DashboardUpdatePostDto> updatedPost = postService.updatePost(slug, postDto, newThumbnail, newContentImages, oldThumbnail, oldContentImages);
+        return updatedPost.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
 }

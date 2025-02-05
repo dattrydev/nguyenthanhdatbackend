@@ -1,10 +1,8 @@
 package com.nguyenthanhdat.blog.services.impl;
 
+import com.nguyenthanhdat.blog.domain.dtos.PaginationDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.*;
 import com.nguyenthanhdat.blog.domain.enums.PostStatus;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardCreatePostDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
@@ -22,7 +20,6 @@ import com.nguyenthanhdat.blog.specification.PostSpecification;
 import com.nguyenthanhdat.blog.utils.PresignedUrl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,21 +44,7 @@ public class PostServiceImpl implements PostService {
     private String bucketName;
 
     @Override
-    public List<Post> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-
-        for (Post post : posts) {
-            if (post.getThumbnailUrl() != null) {
-                String thumbnailUrl = presignedUrl.createPresignedGetUrl(bucketName, post.getThumbnailUrl());
-                post.setThumbnailUrl(thumbnailUrl);
-            }
-        }
-
-        return posts;
-    }
-
-    @Override
-    public Map<String, Object> getDashboardPostList(String title, String status, Integer readingTime, String category, int page, int size) {
+    public Optional<DashboardPostListPagingDto> getDashboardPostList(String title, String status, Integer readingTime, String category, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Specification<Post> specification = Specification.where(PostSpecification.hasStatus(status != null ? PostStatus.valueOf(status) : null))
@@ -77,16 +60,13 @@ public class PostServiceImpl implements PostService {
 
         long totalRecords = postRepository.count(specification);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("posts", postDtos);
-        response.put("totalRecords", totalRecords);
-        response.put("totalPages", postPage.getTotalPages());
-        response.put("currentPage", page);
+        DashboardPostListPagingDto dashboardPostListPagingDto = DashboardPostListPagingDto.builder()
+                .posts(postDtos)
+                .paginationDto(new PaginationDto(totalRecords, page, size))
+                .build();
 
-        return response;
+        return Optional.of(dashboardPostListPagingDto);
     }
-
-
 
     @Override
     public Optional<DashboardPostDto> getPostBySlug(String slug) {
@@ -111,7 +91,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public DashboardPostDto createPost(DashboardCreatePostDto dashboardCreatePostDto, MultipartFile thumbnail, List<MultipartFile> contentImages) {
+    public Optional<DashboardPostDto> createPost(DashboardCreatePostDto dashboardCreatePostDto, MultipartFile thumbnail, List<MultipartFile> contentImages) {
         if (postRepository.existsByTitle(dashboardCreatePostDto.getTitle())) {
             throw new PostAlreadyExistsException("Post with the same title already exists.");
         }
@@ -158,16 +138,12 @@ public class PostServiceImpl implements PostService {
 
         post = postRepository.save(post);
 
-        return dashboardPostMapper.toDto(post);
+        return Optional.of(post)
+                .map(dashboardPostMapper::toDto);
     }
 
     @Override
-    public Post createPostWithoutImage(Post post) {
-        return postRepository.save(post);
-    }
-
-    @Override
-    public DashboardUpdatePostDto updatePost(String slug, DashboardUpdatePostDto dashboardUpdatePostDto, MultipartFile newThumbnail,
+    public Optional<DashboardUpdatePostDto> updatePost(String slug, DashboardUpdatePostDto dashboardUpdatePostDto, MultipartFile newThumbnail,
                            List<MultipartFile> newContentImages, String oldThumbnail,
                            List<String> oldContentImages) {
         Post post = postRepository.findBySlug(slug);
@@ -223,7 +199,7 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(post);
 
-        return dashboardPostMapper.toUpdatePostDto(post);
+        return Optional.of(dashboardPostMapper.toUpdatePostDto(post));
     }
 
 }

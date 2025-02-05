@@ -1,4 +1,4 @@
-package com.nguyenthanhdat.blog.domain.dtos.dashboard;
+package com.nguyenthanhdat.blog.domain.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LoginRequestDto {
-    private String email;
-    private String password;
+public class PaginationDto {
+    private long totalRecords;
+    private int totalPages;
+    private int currentPage;
 }

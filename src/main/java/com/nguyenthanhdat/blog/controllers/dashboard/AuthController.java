@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.controllers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.LoginResponseDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.LoginRequestDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.LoginRequestDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.user.UserDto;
 import com.nguyenthanhdat.blog.domain.entities.User;
 import com.nguyenthanhdat.blog.services.AuthenticationService;
