@@ -1,9 +1,10 @@
 package com.nguyenthanhdat.blog.mappers.dashboard.impl;
 
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.DashboardCategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardCreatePostDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.PostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.TagDto;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
@@ -16,14 +17,14 @@ import java.util.stream.Collectors;
 @Component
 public class CustomDashboardPostMapperImpl implements DashboardPostMapper {
     @Override
-    public PostDto toDto(Post post) {
-        return PostDto.builder()
+    public DashboardPostDto toDto(Post post) {
+        return DashboardPostDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
                 .status(post.getStatus())
                 .readingTime(post.getReadingTime())
                 .slug(post.getSlug())
-                .category(CategoryDto.builder()
+                .category(DashboardCategoryDto.builder()
                         .id(post.getCategory().getId())
                         .name(post.getCategory().getName())
                         .build())
@@ -38,7 +39,7 @@ public class CustomDashboardPostMapperImpl implements DashboardPostMapper {
                 .build();    }
 
     @Override
-    public DashboardPostListDto toDashboardPostListDto(Post post) {
+    public DashboardPostListDto toPostListDto(Post post) {
         return DashboardPostListDto.builder()
                 .title(post.getTitle())
                 .status(post.getStatus())
@@ -51,7 +52,7 @@ public class CustomDashboardPostMapperImpl implements DashboardPostMapper {
     }
 
     @Override
-    public DashboardUpdatePostDto toDashboardUpdatePostDto(Post post) {
+    public DashboardUpdatePostDto toUpdatePostDto(Post post) {
         return DashboardUpdatePostDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())

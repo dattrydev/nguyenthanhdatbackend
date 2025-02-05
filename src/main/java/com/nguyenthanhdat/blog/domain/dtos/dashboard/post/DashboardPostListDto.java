@@ -1,6 +1,6 @@
 package com.nguyenthanhdat.blog.domain.dtos.dashboard.post;
 
-import com.nguyenthanhdat.blog.domain.PostStatus;
+import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import lombok.*;
 
 @Data

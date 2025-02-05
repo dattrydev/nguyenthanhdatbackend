@@ -1,12 +1,12 @@
 package com.nguyenthanhdat.blog.controllers.dashboard;
 
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.CreatePostDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardCreatePostDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.PostDto;
-import com.nguyenthanhdat.blog.domain.entities.Post;
-import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
+import com.nguyenthanhdat.blog.exceptions.dashboard.post.PostNotFoundException;
 import com.nguyenthanhdat.blog.services.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +21,7 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping
-    public Map<String, Object> getFilteredPosts(
+    public ResponseEntity<Map<String, Object>> getPostList(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Integer readingTime,
@@ -29,23 +29,30 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        return postService.getAllDashboardPosts(title, status, readingTime, category, page, size);
+        Map<String, Object> response = postService.getDashboardPostList(title, status, readingTime, category, page, size);
+
+        if (response.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "No posts found"));
+        }
+
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<PostDto> getPostBySlug(@PathVariable String slug) {
+    public ResponseEntity<DashboardPostDto> getPostBySlug(@PathVariable String slug) {
         return postService.getPostBySlug(slug)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new PostNotFoundException("Post " + slug + " not found"));
     }
 
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<Post> createPost(
-            @ModelAttribute  CreatePostDto createPostDto,
+    public ResponseEntity<DashboardPostDto> createPost(
+            @ModelAttribute DashboardCreatePostDto dashboardCreatePostDto,
             @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestParam(value = "contentImages", required = false) List<MultipartFile> contentImages
     ) {
-        Post savedPost = postService.createPost(createPostDto, thumbnail, contentImages);
+        DashboardPostDto savedPost = postService.createPost(dashboardCreatePostDto, thumbnail, contentImages);
         return ResponseEntity.ok(savedPost);
     }
 

@@ -1,6 +1,6 @@
 package com.nguyenthanhdat.blog.domain.entities;
 
-import com.nguyenthanhdat.blog.domain.PostStatus;
+import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import com.nguyenthanhdat.blog.utils.SlugGenerator;
 import jakarta.persistence.*;
 import lombok.*;

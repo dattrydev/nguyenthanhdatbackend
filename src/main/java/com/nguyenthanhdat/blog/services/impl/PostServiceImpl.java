@@ -1,13 +1,17 @@
 package com.nguyenthanhdat.blog.services.impl;
 
-import com.nguyenthanhdat.blog.domain.PostStatus;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.CreatePostDto;
+import com.nguyenthanhdat.blog.domain.enums.PostStatus;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardCreatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.PostDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
+import com.nguyenthanhdat.blog.exceptions.dashboard.error.FileUploadException;
+import com.nguyenthanhdat.blog.exceptions.dashboard.category.CategoryNotFoundException;
+import com.nguyenthanhdat.blog.exceptions.dashboard.post.PostAlreadyExistsException;
+import com.nguyenthanhdat.blog.exceptions.dashboard.tag.TagNotFoundException;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
 import com.nguyenthanhdat.blog.repositories.CategoryRepository;
 import com.nguyenthanhdat.blog.repositories.PostRepository;
@@ -18,6 +22,7 @@ import com.nguyenthanhdat.blog.specification.PostSpecification;
 import com.nguyenthanhdat.blog.utils.PresignedUrl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,7 +61,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Map<String, Object> getAllDashboardPosts(String title, String status, Integer readingTime, String category, int page, int size) {
+    public Map<String, Object> getDashboardPostList(String title, String status, Integer readingTime, String category, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Specification<Post> specification = Specification.where(PostSpecification.hasStatus(status != null ? PostStatus.valueOf(status) : null))
@@ -68,7 +72,7 @@ public class PostServiceImpl implements PostService {
         Page<Post> postPage = postRepository.findAll(specification, pageable);
 
         List<DashboardPostListDto> postDtos = postPage.stream()
-                .map(dashboardPostMapper::toDashboardPostListDto)
+                .map(dashboardPostMapper::toPostListDto)
                 .collect(Collectors.toList());
 
         long totalRecords = postRepository.count(specification);
@@ -85,7 +89,7 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public Optional<PostDto> getPostBySlug(String slug) {
+    public Optional<DashboardPostDto> getPostBySlug(String slug) {
         Post post = postRepository.findBySlug(slug);
         if (post != null) {
             if (post.getThumbnailUrl() != null) {
@@ -107,42 +111,54 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post createPost(CreatePostDto createPostDto, MultipartFile thumbnail, List<MultipartFile> contentImages) {
-        Category category = categoryRepository.findById(createPostDto.getCategory_id())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+    public DashboardPostDto createPost(DashboardCreatePostDto dashboardCreatePostDto, MultipartFile thumbnail, List<MultipartFile> contentImages) {
+        if (postRepository.existsByTitle(dashboardCreatePostDto.getTitle())) {
+            throw new PostAlreadyExistsException("Post with the same title already exists.");
+        }
 
-        Set<Tag> tags = createPostDto.getTag_ids().stream()
+        Category category = categoryRepository.findById(dashboardCreatePostDto.getCategory_id())
+                .orElseThrow(() -> new CategoryNotFoundException("Category " + dashboardCreatePostDto.getCategory_id() + " not found"));
+
+        Set<Tag> tags = dashboardCreatePostDto.getTag_ids().stream()
                 .map(tagId -> tagRepository.findById(tagId)
-                        .orElseThrow(() -> new RuntimeException("Tag not found")))
+                        .orElseThrow(() -> new TagNotFoundException("Tag " + tagId + " not found")))
                 .collect(Collectors.toSet());
 
         Post post = Post.builder()
-                .title(createPostDto.getTitle())
-                .content(createPostDto.getContent())
-                .readingTime(createPostDto.getReadingTime())
-                .status(createPostDto.getStatus())
+                .title(dashboardCreatePostDto.getTitle())
+                .content(dashboardCreatePostDto.getContent())
+                .readingTime(dashboardCreatePostDto.getReadingTime())
+                .status(dashboardCreatePostDto.getStatus())
                 .category(category)
                 .tags(tags)
                 .build();
 
         if (thumbnail != null && !thumbnail.isEmpty()) {
-            Logger.getGlobal().info("thumbnail is not null");
-            String thumbnailUrl = fileStorageService.uploadFile(thumbnail);
-            post.setThumbnailUrl(thumbnailUrl);
+            try {
+                String thumbnailUrl = fileStorageService.uploadFile(thumbnail);
+                post.setThumbnailUrl(thumbnailUrl);
+            } catch (Exception e) {
+                throw new FileUploadException("Error uploading thumbnail");
+            }
         }
 
         if (contentImages != null && !contentImages.isEmpty()) {
-            Logger.getGlobal().info("contentImages is not null");
             Set<String> imageUrls = new HashSet<>();
             for (MultipartFile image : contentImages) {
                 if (!image.isEmpty()) {
-                    imageUrls.add(fileStorageService.uploadFile(image));
+                    try {
+                        imageUrls.add(fileStorageService.uploadFile(image));
+                    } catch (Exception e) {
+                        throw new FileUploadException("Error uploading content images");
+                    }
                 }
             }
             post.setContentImages(imageUrls);
         }
 
-        return postRepository.save(post);
+        post = postRepository.save(post);
+
+        return dashboardPostMapper.toDto(post);
     }
 
     @Override
@@ -207,7 +223,7 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(post);
 
-        return dashboardPostMapper.toDashboardUpdatePostDto(post);
+        return dashboardPostMapper.toUpdatePostDto(post);
     }
 
 }

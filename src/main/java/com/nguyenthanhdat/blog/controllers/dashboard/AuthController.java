@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.controllers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.LoginResponseDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.LoginRequest;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.LoginRequestDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.user.UserDto;
 import com.nguyenthanhdat.blog.domain.entities.User;
 import com.nguyenthanhdat.blog.services.AuthenticationService;
@@ -23,15 +23,15 @@ public class AuthController {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping(path = "/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
         try {
-            User user = userService.findUserByEmail(loginRequest.getEmail());
+            User user = userService.findUserByEmail(loginRequestDto.getEmail());
             if (user == null) {
-                log.warn("User not found: {}", loginRequest.getEmail());
+                log.warn("User not found: {}", loginRequestDto.getEmail());
                 throw new BadCredentialsException("Email or password is incorrect");
             }
 
-            var userDetails = authenticationService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
+            var userDetails = authenticationService.authenticate(loginRequestDto.getEmail(), loginRequestDto.getPassword());
             String tokenValue = authenticationService.generateToken(userDetails);
 
             UserDto userDto = UserDto.builder()
@@ -48,7 +48,7 @@ public class AuthController {
             return ResponseEntity.ok(loginResponseDto);
 
         } catch (BadCredentialsException e) {
-            log.error("Invalid credentials for email: {}", loginRequest.getEmail());
+            log.error("Invalid credentials for email: {}", loginRequestDto.getEmail());
             throw new BadCredentialsException("Email or password is incorrect");
         } catch (Exception e) {
             log.error("Unexpected error during login", e);

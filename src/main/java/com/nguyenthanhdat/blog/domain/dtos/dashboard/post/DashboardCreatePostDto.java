@@ -1,6 +1,6 @@
 package com.nguyenthanhdat.blog.domain.dtos.dashboard.post;
 
-import com.nguyenthanhdat.blog.domain.PostStatus;
+import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreatePostDto {
+public class DashboardCreatePostDto {
     private String title;
     private String content;
     private PostStatus status;

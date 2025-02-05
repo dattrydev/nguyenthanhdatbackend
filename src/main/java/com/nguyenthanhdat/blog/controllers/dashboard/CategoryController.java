@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.controllers.dashboard;
 
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CategoryListDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.CreateCategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.DashboardCategoryListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.DashboardCreateCategoryDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardCategoryMapper;
 import com.nguyenthanhdat.blog.services.CategoryService;
@@ -18,12 +18,15 @@ import java.util.UUID;
 @RequestMapping("/api/dashboard/v1/categories")
 @RequiredArgsConstructor
 public class CategoryController {
-
     private final CategoryService categoryService;
     private final DashboardCategoryMapper dashboardCategoryMapper;
+
     @GetMapping
-    public ResponseEntity<List<CategoryListDto>> getAllCategories() {
-        List<CategoryListDto> categories = categoryService.listCategories()
+    public ResponseEntity<List<DashboardCategoryListDto>> getCategoryList(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        List<DashboardCategoryListDto> categories = categoryService.listCategories()
                 .stream().map(dashboardCategoryMapper::toDto)
                 .toList();
 
@@ -31,8 +34,8 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryListDto> createCategory(@Valid @RequestBody CreateCategoryDto createCategoryDto) {
-    Category categoryToCreate = dashboardCategoryMapper.toEntity(createCategoryDto);
+    public ResponseEntity<DashboardCategoryListDto> createCategory(@Valid @RequestBody DashboardCreateCategoryDto dashboardCreateCategoryDto) {
+    Category categoryToCreate = dashboardCategoryMapper.toEntity(dashboardCreateCategoryDto);
     Category savedCategory = categoryService.createCategory(categoryToCreate);
         return new ResponseEntity<>(
             dashboardCategoryMapper.toDto(savedCategory),
@@ -41,7 +44,7 @@ public class CategoryController {
     }
 
     @PatchMapping
-    public ResponseEntity<CategoryListDto> updateCategory(@Valid @RequestBody Category category) {
+    public ResponseEntity<DashboardCategoryListDto> updateCategory(@Valid @RequestBody Category category) {
         Category categoryToUpdate = categoryService.updateCategory(category);
         return new ResponseEntity<>(
             dashboardCategoryMapper.toDto(categoryToUpdate),

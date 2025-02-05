@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.specification;
 
 import com.nguyenthanhdat.blog.domain.entities.Post;
-import com.nguyenthanhdat.blog.domain.PostStatus;
+import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 public class PostSpecification {

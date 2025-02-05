@@ -11,7 +11,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryListDto {
+public class DashboardCategoryListDto {
     private UUID id;
     private String name;
     private int postCount;

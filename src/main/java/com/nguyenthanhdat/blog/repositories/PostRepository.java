@@ -13,7 +13,8 @@ import java.util.UUID;
 @Repository
 public interface PostRepository extends JpaRepository<Post, UUID>, JpaSpecificationExecutor<Post> {
     Post findBySlug(String slug);
+    Optional<Post> findByTitle(String title);
+    boolean existsByTitle(String title);
     Page<Post> findByTitleContainingAndStatus(String title, String status, Pageable pageable);
     long countByTitleContainingAndStatus(String title, String status);
-
 }
