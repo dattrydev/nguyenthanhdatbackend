@@ -5,10 +5,10 @@ import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
-import com.nguyenthanhdat.blog.exceptions.dashboard.error.FileUploadException;
-import com.nguyenthanhdat.blog.exceptions.dashboard.category.CategoryNotFoundException;
-import com.nguyenthanhdat.blog.exceptions.dashboard.post.PostAlreadyExistsException;
-import com.nguyenthanhdat.blog.exceptions.dashboard.tag.TagNotFoundException;
+import com.nguyenthanhdat.blog.exceptions.FileUploadException;
+import com.nguyenthanhdat.blog.exceptions.ResourceAlreadyExistsException;
+import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
+import com.nguyenthanhdat.blog.exceptions.handler.GlobalExceptionHandler;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
 import com.nguyenthanhdat.blog.repositories.CategoryRepository;
 import com.nguyenthanhdat.blog.repositories.PostRepository;
@@ -95,15 +95,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public Optional<DashboardPostDto> createPost(DashboardCreatePostDto dashboardCreatePostDto, MultipartFile thumbnail, List<MultipartFile> contentImages) {
         if (postRepository.existsByTitle(dashboardCreatePostDto.getTitle())) {
-            throw new PostAlreadyExistsException("Post with the same title already exists.");
+            throw new ResourceAlreadyExistsException("Post " + dashboardCreatePostDto.getTitle() + " already exists");
         }
 
         Category category = categoryRepository.findById(dashboardCreatePostDto.getCategory_id())
-                .orElseThrow(() -> new CategoryNotFoundException("Category " + dashboardCreatePostDto.getCategory_id() + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category " + dashboardCreatePostDto.getCategory_id() + " not found"));
 
         Set<Tag> tags = dashboardCreatePostDto.getTag_ids().stream()
                 .map(tagId -> tagRepository.findById(tagId)
-                        .orElseThrow(() -> new TagNotFoundException("Tag " + tagId + " not found")))
+                        .orElseThrow(() -> new ResourceNotFoundException("Tag " + tagId + " not found")))
                 .collect(Collectors.toSet());
 
         Post post = Post.builder()
@@ -150,7 +150,7 @@ public class PostServiceImpl implements PostService {
                            List<String> oldContentImages) {
         Post post = postRepository.findBySlug(slug);
         if (post == null) {
-            throw new RuntimeException("Post not found");
+            throw new ResourceNotFoundException("Post " + slug + " not found");
         }
 
         post.setTitle(dashboardUpdatePostDto.getTitle());
@@ -159,12 +159,12 @@ public class PostServiceImpl implements PostService {
         post.setStatus(dashboardUpdatePostDto.getStatus());
 
         Category category = categoryRepository.findById(dashboardUpdatePostDto.getCategory_id())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category " + dashboardUpdatePostDto.getCategory_id() + " not found"));
         post.setCategory(category);
 
         Set<Tag> tags = dashboardUpdatePostDto.getTag_ids().stream()
                 .map(tag_id -> tagRepository.findById(tag_id)
-                        .orElseThrow(() -> new RuntimeException("Tag not found")))
+                        .orElseThrow(() -> new ResourceNotFoundException("Tag " + tag_id + " not found")))
                 .collect(Collectors.toSet());
         post.setTags(tags);
 

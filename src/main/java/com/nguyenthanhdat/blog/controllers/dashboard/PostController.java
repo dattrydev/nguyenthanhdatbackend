@@ -4,7 +4,8 @@ import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardCreatePostDto
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListPagingDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
-import com.nguyenthanhdat.blog.exceptions.dashboard.post.PostNotFoundException;
+import com.nguyenthanhdat.blog.exceptions.ResourceCreationException;
+import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
 import com.nguyenthanhdat.blog.services.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,15 +34,21 @@ public class PostController {
         Optional<DashboardPostListPagingDto> response = postService.getDashboardPostList(title, status, readingTime, category, page, size);
 
         return response.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).build());
+                .orElseThrow(() -> new ResourceNotFoundException("No post found"));
     }
 
     @GetMapping("/{slug}")
     public ResponseEntity<DashboardPostDto> getPostBySlug(@PathVariable String slug) {
         return postService.getPostBySlug(slug)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new PostNotFoundException("Post " + slug + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Post " + slug + " not found"));
     }
+
+//    @GetMapping("/{field}")
+//    public ResponseEntity<Void> validateField(@PathVariable String field, @RequestParam String value) {
+//        validationService.validateField(field, value);
+//        return ResponseEntity.ok().build();
+//    }
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<DashboardPostDto> createPost(
@@ -51,7 +58,7 @@ public class PostController {
     ) {
         Optional<DashboardPostDto> savedPost = postService.createPost(dashboardCreatePostDto, thumbnail, contentImages);
         return savedPost.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                .orElseThrow(() -> new ResourceCreationException("Failed to create post"));
     }
 
     @PatchMapping("/{slug}")

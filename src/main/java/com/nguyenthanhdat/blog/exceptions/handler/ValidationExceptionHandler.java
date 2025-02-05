@@ -1,9 +1,9 @@
-package com.nguyenthanhdat.blog.exceptions.dashboard.handler;
+package com.nguyenthanhdat.blog.exceptions.handler;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.ApiErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Order(1)
 @ControllerAdvice
 public class ValidationExceptionHandler {
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, InvalidMediaTypeException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponseDto> handleValidationException(MethodArgumentNotValidException e) {
         log.error("Validation error: ", e);
 

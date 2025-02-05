@@ -1,8 +1,10 @@
 package com.nguyenthanhdat.blog.controllers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardCreateTagDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardTagListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardTagDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardTagListPagingDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
+import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardTagMapper;
 import com.nguyenthanhdat.blog.services.TagService;
 import jakarta.validation.Valid;
@@ -11,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -22,37 +23,40 @@ public class TagController {
     private final DashboardTagMapper dashboardTagMapper;
 
     @GetMapping
-    public ResponseEntity<List<DashboardTagListDto>> getAllTags() {
-        List<DashboardTagListDto> tags = tagService.listTags()
-                .stream().map(dashboardTagMapper::toDto)
-                .toList();
+    public ResponseEntity<DashboardTagListPagingDto> getDashboardTagList(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Optional<DashboardTagListPagingDto> tags = tagService.getDashboardTagList(name, page, size);
 
-        return ResponseEntity.ok(tags);
+        return tags.map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("No tags found"));
     }
 
     @GetMapping(params = "name")
-    public ResponseEntity<DashboardTagListDto> getTagByName(@RequestParam(name = "name") String name) {
-        Optional<DashboardTagListDto> tag = tagService.getTagByName(name);
+    public ResponseEntity<DashboardTagDto> getTagByName(@RequestParam(name = "name") String name) {
+        Optional<DashboardTagDto> tag = tagService.getTagByName(name);
         return tag.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new ResourceNotFoundException("Tag " + name + " not found"));
     }
 
     @PostMapping
-    public ResponseEntity<DashboardTagListDto> createTag(@Valid @RequestBody DashboardCreateTagDto dashboardCreateTagDto) {
+    public ResponseEntity<DashboardTagDto> createTag(@Valid @RequestBody DashboardCreateTagDto dashboardCreateTagDto) {
         Tag tagToCreate = dashboardTagMapper.toEntity(dashboardCreateTagDto);
-        Tag savedTag = tagService.createTag(tagToCreate);
-        return new ResponseEntity<>(
-                dashboardTagMapper.toDto(savedTag),
-                HttpStatus.CREATED
+        Optional<Tag> savedTag = tagService.createTag(tagToCreate);
+        return savedTag.map(tag -> ResponseEntity.status(HttpStatus.CREATED).body(dashboardTagMapper.toDto(tag)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+
         );
     }
 
     @PatchMapping
-    public ResponseEntity<DashboardTagListDto> updateTag(@Valid @RequestBody Tag tag) {
-        Tag updatedTag = tagService.updateTag(tag);
-        return ResponseEntity.ok(dashboardTagMapper.toDto(updatedTag));
+    public ResponseEntity<DashboardTagDto> updateTag(@Valid @RequestBody Tag tag) {
+        Optional<Tag> updatedTag = tagService.updateTag(tag);
+        return updatedTag.map(t -> ResponseEntity.ok(dashboardTagMapper.toDto(t)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
-
 
     @DeleteMapping
     public ResponseEntity<Void> deleteTag(@RequestParam(name = "name") String name) {
