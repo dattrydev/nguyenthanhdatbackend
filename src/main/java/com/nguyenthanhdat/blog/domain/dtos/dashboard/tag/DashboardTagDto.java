@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TagDto {
+public class DashboardTagDto {
     private UUID id;
     private String name;
 }

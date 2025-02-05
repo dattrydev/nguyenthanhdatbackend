@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateTagDto {
+public class DashboardCreateTagDto {
     @NotBlank(message = "Tag name is required")
     @Size(min = 2, max = 50, message = "Tag name must be between 2 and 50 characters")
     @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Tag name must contain only letters, numbers and spaces")

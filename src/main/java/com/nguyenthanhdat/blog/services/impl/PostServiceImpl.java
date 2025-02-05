@@ -1,6 +1,5 @@
 package com.nguyenthanhdat.blog.services.impl;
 
-import com.nguyenthanhdat.blog.domain.dtos.PaginationDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.*;
 import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import com.nguyenthanhdat.blog.domain.entities.Category;
@@ -59,10 +58,13 @@ public class PostServiceImpl implements PostService {
                 .collect(Collectors.toList());
 
         long totalRecords = postRepository.count(specification);
+        int totalPages = postPage.getTotalPages();
 
         DashboardPostListPagingDto dashboardPostListPagingDto = DashboardPostListPagingDto.builder()
                 .posts(postDtos)
-                .paginationDto(new PaginationDto(totalRecords, page, size))
+                .totalRecords(totalRecords)
+                .totalPages(totalPages)
+                .currentPage(page)
                 .build();
 
         return Optional.of(dashboardPostListPagingDto);

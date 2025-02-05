@@ -1,16 +1,13 @@
 package com.nguyenthanhdat.blog.domain.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@RequiredArgsConstructor
+@SuperBuilder
 public class PaginationDto {
-    private long totalRecords;
-    private int totalPages;
-    private int currentPage;
+    protected long totalRecords;
+    protected int totalPages;
+    protected int currentPage;
 }

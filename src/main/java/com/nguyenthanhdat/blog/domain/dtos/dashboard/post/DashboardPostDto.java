@@ -1,8 +1,8 @@
 package com.nguyenthanhdat.blog.domain.dtos.dashboard.post;
 
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardTagDto;
 import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.DashboardCategoryDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.TagDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +21,7 @@ public class DashboardPostDto {
     private Integer readingTime;
     private String slug;
     private DashboardCategoryDto category;
-    private Set<TagDto> tags;
+    private Set<DashboardTagDto> tags;
     private String thumbnailUrl;
     private Set<String> contentImages;
 }

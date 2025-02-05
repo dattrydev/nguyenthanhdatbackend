@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -51,15 +50,15 @@ public class Post {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    private Set<Tag> tags = new HashSet<>();
+    private Set<Tag> tags;
 
-    @Column(nullable = true)
+    @Column()
     private String thumbnailUrl;
 
     @ElementCollection
     @CollectionTable(name = "post_content_images", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "image_url")
-    private Set<String> contentImages = new HashSet<>();
+    private Set<String> contentImages;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

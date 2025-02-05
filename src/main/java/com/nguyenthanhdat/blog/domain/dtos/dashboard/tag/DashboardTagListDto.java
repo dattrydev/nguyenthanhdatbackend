@@ -12,7 +12,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TagListDto {
+public class DashboardTagListDto {
     private String name;
     private Set<Post> posts;
 }

@@ -1,10 +1,8 @@
 package com.nguyenthanhdat.blog.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -25,7 +23,7 @@ public class Category {
     private String name;
 
     @OneToMany(mappedBy = "category")
-    private List<Post> posts = new ArrayList<>();
+    private List<Post> posts;
 
     @Override
     public boolean equals(Object o) {

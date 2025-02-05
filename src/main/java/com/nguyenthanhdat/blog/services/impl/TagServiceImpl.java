@@ -1,6 +1,6 @@
 package com.nguyenthanhdat.blog.services.impl;
 
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.TagListDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardTagListDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardTagMapper;
 import com.nguyenthanhdat.blog.repositories.TagRepository;
@@ -23,7 +23,7 @@ public class TagServiceImpl implements TagService {
         return tagRepository.findAll();
     }
 
-    public Optional<TagListDto> getTagByName(String name) {
+    public Optional<DashboardTagListDto> getTagByName(String name) {
         Optional<Tag> tag = tagRepository.findByName(name);
         return tag.map(dashboardTagMapper::toDto);
     }

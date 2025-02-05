@@ -1,18 +1,16 @@
 package com.nguyenthanhdat.blog.domain.dtos.dashboard.post;
 
 import com.nguyenthanhdat.blog.domain.dtos.PaginationDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class DashboardPostListPagingDto {
+@SuperBuilder
+public class DashboardPostListPagingDto extends PaginationDto{
     private List<DashboardPostListDto> posts;
-    private PaginationDto paginationDto;
 }
