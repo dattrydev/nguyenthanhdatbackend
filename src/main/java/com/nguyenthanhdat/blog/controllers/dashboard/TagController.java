@@ -45,6 +45,14 @@ public class TagController {
                 .orElseThrow(() -> new ResourceNotFoundException("Tag " + id + " not found"));
     }
 
+    @GetMapping("/check-unique")
+    public ResponseEntity<Boolean> checkUniqueField(
+            @RequestParam String field,
+            @RequestParam String value) {
+        boolean exists = tagService.isFieldExists(field, value);
+        return ResponseEntity.ok(exists);
+    }
+
     @PostMapping
     public ResponseEntity<DashboardTagDto> createTag(@Valid @RequestBody DashboardCreateTagDto dashboardCreateTagDto) {
         Optional<DashboardTagDto> savedTag = tagService.createTag(dashboardCreateTagDto);

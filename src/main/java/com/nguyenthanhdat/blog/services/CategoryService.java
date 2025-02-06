@@ -10,4 +10,5 @@ public interface CategoryService {
     Optional<DashboardCategoryDto> createCategory(DashboardCreateCategoryDto dashboardCreateCategoryDto);
     Optional<DashboardCategoryDto> updateCategory(UUID id, DashboardUpdateCategoryDto category);
     void deleteCategory(UUID id);
+    boolean isFieldExists(String field, String value);
 }

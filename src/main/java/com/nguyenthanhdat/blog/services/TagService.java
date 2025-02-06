@@ -11,4 +11,5 @@ public interface TagService {
     Optional<DashboardTagDto> createTag(DashboardCreateTagDto createTagDto);
     Optional<DashboardTagDto> updateTag(UUID id, DashboardUpdateTagDto tag);
     void deleteTag(UUID id);
+    boolean isFieldExists(String field, String value);
 }

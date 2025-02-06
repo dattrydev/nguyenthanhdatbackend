@@ -108,4 +108,12 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
+    @Override
+    public boolean isFieldExists(String field, String value) {
+        return switch (field) {
+            case "name" -> categoryRepository.existsByName(value);
+            default -> false;
+        };
+    }
+
 }

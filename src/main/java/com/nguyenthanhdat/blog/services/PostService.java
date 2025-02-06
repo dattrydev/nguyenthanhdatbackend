@@ -18,4 +18,6 @@ public interface PostService {
     Optional<DashboardPostDto> createPost(DashboardCreatePostDto dashboardCreatePostDto, MultipartFile thumbnail, List<MultipartFile> contentImages);
 
     Optional<DashboardUpdatePostDto> updatePost(UUID id, DashboardUpdatePostDto postDto, MultipartFile newThumbnail, List<MultipartFile> newContentImages, String oldThumbnail, List<String> oldContentImages);
+
+    boolean isFieldExists(String field, String value);
 }

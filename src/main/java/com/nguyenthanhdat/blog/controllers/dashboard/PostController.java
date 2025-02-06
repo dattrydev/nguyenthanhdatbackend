@@ -47,11 +47,14 @@ public class PostController {
                 .orElseThrow(() -> new ResourceNotFoundException("Post " + slug + " not found"));
     }
 
-//    @GetMapping("/{field}")
-//    public ResponseEntity<Void> validateField(@PathVariable String field, @RequestParam String value) {
-//        validationService.validateField(field, value);
-//        return ResponseEntity.ok().build();
-//    }
+    @GetMapping("/check-unique")
+    public ResponseEntity<Boolean> checkUniqueField(
+            @RequestParam String field,
+            @RequestParam String value) {
+        boolean exists = postService.isFieldExists(field, value);
+        return ResponseEntity.ok(exists);
+    }
+
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<DashboardPostDto> createPost(

@@ -107,5 +107,13 @@ public class TagServiceImpl implements TagService {
         }
     }
 
+    @Override
+    public boolean isFieldExists(String field, String value) {
+        return switch (field) {
+            case "name" -> tagRepository.existsByName(value);
+            default -> false;
+        };
+    }
+
 
 }

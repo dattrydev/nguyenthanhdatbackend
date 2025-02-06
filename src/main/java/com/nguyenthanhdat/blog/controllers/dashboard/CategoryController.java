@@ -41,6 +41,14 @@ public class CategoryController {
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
     }
 
+    @GetMapping("/check-unique")
+    public ResponseEntity<Boolean> checkUniqueField(
+            @RequestParam String field,
+            @RequestParam String value) {
+        boolean exists = categoryService.isFieldExists(field, value);
+        return ResponseEntity.ok(exists);
+    }
+
     @PostMapping
     public ResponseEntity<DashboardCreateCategoryDto> createCategory(@Valid @RequestBody DashboardCreateCategoryDto dashboardCreateCategoryDto) {
         Optional<DashboardCategoryDto> savedCategory = categoryService.createCategory(dashboardCreateCategoryDto);

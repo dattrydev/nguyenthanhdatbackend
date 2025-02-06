@@ -30,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.nguyenthanhdat.blog.utils.GenerateSlug.generateSlug;
+
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
@@ -97,20 +99,27 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Optional<DashboardPostDto> createPost(DashboardCreatePostDto dashboardCreatePostDto, MultipartFile thumbnail, List<MultipartFile> contentImages) {
-        if (postRepository.existsByTitle(dashboardCreatePostDto.getTitle())) {
-            throw new ResourceAlreadyExistsException("Post " + dashboardCreatePostDto.getTitle() + " already exists");
+        String title = dashboardCreatePostDto.getTitle();
+        if (postRepository.existsByTitle(title)) {
+            throw new ResourceAlreadyExistsException("Post with title '" + title + "' already exists.");
+        }
+
+        String generatedSlug = generateSlug(title);
+        if (postRepository.existsBySlug(generatedSlug)) {
+            throw new ResourceAlreadyExistsException("Post with slug '" + generatedSlug + "' already exists.");
         }
 
         Category category = categoryRepository.findById(dashboardCreatePostDto.getCategory_id())
-                .orElseThrow(() -> new ResourceNotFoundException("Category " + dashboardCreatePostDto.getCategory_id() + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category with ID '" + dashboardCreatePostDto.getCategory_id() + "' not found."));
 
         Set<Tag> tags = dashboardCreatePostDto.getTag_ids().stream()
                 .map(tagId -> tagRepository.findById(tagId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Tag " + tagId + " not found")))
+                        .orElseThrow(() -> new ResourceNotFoundException("Tag with ID '" + tagId + "' not found.")))
                 .collect(Collectors.toSet());
 
         Post post = Post.builder()
-                .title(dashboardCreatePostDto.getTitle())
+                .title(title)
+                .slug(generatedSlug)
                 .content(dashboardCreatePostDto.getContent())
                 .readingTime(dashboardCreatePostDto.getReadingTime())
                 .status(dashboardCreatePostDto.getStatus())
@@ -123,7 +132,7 @@ public class PostServiceImpl implements PostService {
                 String thumbnailUrl = fileStorageService.uploadFile(thumbnail);
                 post.setThumbnailUrl(thumbnailUrl);
             } catch (Exception e) {
-                throw new FileUploadException("Error uploading thumbnail");
+                throw new FileUploadException("Error uploading thumbnail: " + e.getMessage());
             }
         }
 
@@ -134,7 +143,7 @@ public class PostServiceImpl implements PostService {
                     try {
                         imageUrls.add(fileStorageService.uploadFile(image));
                     } catch (Exception e) {
-                        throw new FileUploadException("Error uploading content images");
+                        throw new FileUploadException("Error uploading content images: " + e.getMessage());
                     }
                 }
             }
@@ -209,5 +218,16 @@ public class PostServiceImpl implements PostService {
 
         return Optional.of(dashboardPostMapper.toUpdatePostDto(post));
     }
+
+    @Override
+    public boolean isFieldExists(String field, String value) {
+        switch (field.toLowerCase()) {
+            case "title":
+                return postRepository.existsByTitle(value);
+            default:
+                throw new IllegalArgumentException("Invalid field: " + field);
+        }
+    }
+
 
 }
