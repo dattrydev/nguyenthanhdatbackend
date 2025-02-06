@@ -44,7 +44,7 @@ public class ResourceExceptionHandler {
 
         ApiErrorResponseDto error = ApiErrorResponseDto.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message("An error occurred while uploading the file")
+                .message(e.getMessage())
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -56,7 +56,7 @@ public class ResourceExceptionHandler {
 
         ApiErrorResponseDto error = ApiErrorResponseDto.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message("An error occurred while creating the resource")
+                .message(e.getMessage())
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -68,7 +68,19 @@ public class ResourceExceptionHandler {
 
         ApiErrorResponseDto error = ApiErrorResponseDto.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message("An error occurred while updating the resource")
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ResourceDeleteException.class)
+    public ResponseEntity<ApiErrorResponseDto> handleResourceDeleteException(ResourceDeleteException e) {
+        log.error("Resource delete error: ", e);
+
+        ApiErrorResponseDto error = ApiErrorResponseDto.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(e.getMessage())
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);

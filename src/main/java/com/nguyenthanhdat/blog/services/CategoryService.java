@@ -1,13 +1,13 @@
 package com.nguyenthanhdat.blog.services;
 
-import com.nguyenthanhdat.blog.domain.entities.Category;
-
-import java.util.List;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.*;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface CategoryService {
-    List<Category> listCategories();
-    Category createCategory(Category category);
-    Category updateCategory(Category category);
+    Optional<DashboardCategoryListPagingDto> getDashboardCategoryList(String name, int page, int size, String sortBy, String sortDirection);
+    Optional<DashboardCategoryDto> getDashboardCategoryById(UUID id);
+    Optional<DashboardCategoryDto> createCategory(DashboardCreateCategoryDto dashboardCreateCategoryDto);
+    Optional<DashboardCategoryDto> updateCategory(UUID id, DashboardUpdateCategoryDto category);
     void deleteCategory(UUID id);
 }

@@ -8,7 +8,6 @@ import com.nguyenthanhdat.blog.domain.entities.Tag;
 import com.nguyenthanhdat.blog.exceptions.FileUploadException;
 import com.nguyenthanhdat.blog.exceptions.ResourceAlreadyExistsException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
-import com.nguyenthanhdat.blog.exceptions.handler.GlobalExceptionHandler;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
 import com.nguyenthanhdat.blog.repositories.CategoryRepository;
 import com.nguyenthanhdat.blog.repositories.PostRepository;
@@ -17,11 +16,13 @@ import com.nguyenthanhdat.blog.services.FileStorageService;
 import com.nguyenthanhdat.blog.services.PostService;
 import com.nguyenthanhdat.blog.specification.PostSpecification;
 import com.nguyenthanhdat.blog.utils.PresignedUrl;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,8 +44,9 @@ public class PostServiceImpl implements PostService {
     private String bucketName;
 
     @Override
-    public Optional<DashboardPostListPagingDto> getDashboardPostList(String title, String status, Integer readingTime, String category, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Optional<DashboardPostListPagingDto> getDashboardPostList(String title, String status, Integer readingTime, String category, int page, int size, String sortBy, String sortDirection) {
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Specification<Post> specification = Specification.where(PostSpecification.hasStatus(status != null ? PostStatus.valueOf(status) : null))
                 .and(PostSpecification.hasTitle(title))
@@ -93,6 +95,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public Optional<DashboardPostDto> createPost(DashboardCreatePostDto dashboardCreatePostDto, MultipartFile thumbnail, List<MultipartFile> contentImages) {
         if (postRepository.existsByTitle(dashboardCreatePostDto.getTitle())) {
             throw new ResourceAlreadyExistsException("Post " + dashboardCreatePostDto.getTitle() + " already exists");
@@ -145,13 +148,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Optional<DashboardUpdatePostDto> updatePost(String slug, DashboardUpdatePostDto dashboardUpdatePostDto, MultipartFile newThumbnail,
+    @Transactional
+    public Optional<DashboardUpdatePostDto> updatePost(UUID id, DashboardUpdatePostDto dashboardUpdatePostDto, MultipartFile newThumbnail,
                            List<MultipartFile> newContentImages, String oldThumbnail,
                            List<String> oldContentImages) {
-        Post post = postRepository.findBySlug(slug);
-        if (post == null) {
-            throw new ResourceNotFoundException("Post " + slug + " not found");
+        Optional<Post> optionalPost = postRepository.findById(id);
+        if (optionalPost.isEmpty()) {
+            throw new ResourceNotFoundException("Post " + id + " not found");
         }
+
+        Post post = optionalPost.get();
 
         post.setTitle(dashboardUpdatePostDto.getTitle());
         post.setContent(dashboardUpdatePostDto.getContent());

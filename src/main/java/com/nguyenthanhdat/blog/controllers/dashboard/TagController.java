@@ -3,8 +3,10 @@ package com.nguyenthanhdat.blog.controllers.dashboard;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardCreateTagDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardTagDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardTagListPagingDto;
-import com.nguyenthanhdat.blog.domain.entities.Tag;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardUpdateTagDto;
+import com.nguyenthanhdat.blog.exceptions.ResourceCreationException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
+import com.nguyenthanhdat.blog.exceptions.ResourceUpdateException;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardTagMapper;
 import com.nguyenthanhdat.blog.services.TagService;
 import jakarta.validation.Valid;
@@ -14,53 +16,52 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/dashboard/v1/tags")
 @RequiredArgsConstructor
 public class TagController {
     private final TagService tagService;
-    private final DashboardTagMapper dashboardTagMapper;
 
     @GetMapping
     public ResponseEntity<DashboardTagListPagingDto> getDashboardTagList(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection
     ) {
-        Optional<DashboardTagListPagingDto> tags = tagService.getDashboardTagList(name, page, size);
+        Optional<DashboardTagListPagingDto> tags = tagService.getDashboardTagList(name, page, size, sortBy, sortDirection);
 
         return tags.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("No tags found"));
     }
 
-    @GetMapping(params = "name")
-    public ResponseEntity<DashboardTagDto> getTagByName(@RequestParam(name = "name") String name) {
-        Optional<DashboardTagDto> tag = tagService.getTagByName(name);
+    @GetMapping("/{id}")
+    public ResponseEntity<DashboardTagDto> getDashboardTagById(@PathVariable UUID id){
+        Optional<DashboardTagDto> tag = tagService.getDashboardTagById(id);
         return tag.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("Tag " + name + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tag " + id + " not found"));
     }
 
     @PostMapping
     public ResponseEntity<DashboardTagDto> createTag(@Valid @RequestBody DashboardCreateTagDto dashboardCreateTagDto) {
-        Tag tagToCreate = dashboardTagMapper.toEntity(dashboardCreateTagDto);
-        Optional<Tag> savedTag = tagService.createTag(tagToCreate);
-        return savedTag.map(tag -> ResponseEntity.status(HttpStatus.CREATED).body(dashboardTagMapper.toDto(tag)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
-
-        );
+        Optional<DashboardTagDto> savedTag = tagService.createTag(dashboardCreateTagDto);
+        return savedTag.map(tag -> ResponseEntity.status(HttpStatus.CREATED).body(tag))
+                .orElseThrow(() -> new ResourceCreationException("Tag could not be created"));
     }
 
-    @PatchMapping
-    public ResponseEntity<DashboardTagDto> updateTag(@Valid @RequestBody Tag tag) {
-        Optional<Tag> updatedTag = tagService.updateTag(tag);
-        return updatedTag.map(t -> ResponseEntity.ok(dashboardTagMapper.toDto(t)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<DashboardTagDto> updateTag(@PathVariable UUID id, @Valid @RequestBody DashboardUpdateTagDto tag) {
+        Optional<DashboardTagDto> updatedTag = tagService.updateTag(id, tag);
+        return updatedTag.map(ResponseEntity::ok)
+                .orElseThrow (() -> new ResourceUpdateException("Tag " + id + " could not be updated"));
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteTag(@RequestParam(name = "name") String name) {
-        tagService.deleteTag(name);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Void> deleteTag(@PathVariable UUID id) {
+        tagService.deleteTag(id);
+        return ResponseEntity.noContent().build();
     }
 }

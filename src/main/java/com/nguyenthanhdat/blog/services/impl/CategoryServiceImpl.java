@@ -1,10 +1,21 @@
 package com.nguyenthanhdat.blog.services.impl;
 
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.*;
 import com.nguyenthanhdat.blog.domain.entities.Category;
+import com.nguyenthanhdat.blog.exceptions.ResourceAlreadyExistsException;
+import com.nguyenthanhdat.blog.exceptions.ResourceDeleteException;
+import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
+import com.nguyenthanhdat.blog.mappers.dashboard.DashboardCategoryMapper;
 import com.nguyenthanhdat.blog.repositories.CategoryRepository;
 import com.nguyenthanhdat.blog.services.CategoryService;
+import com.nguyenthanhdat.blog.specification.CategorySpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,32 +27,69 @@ import java.util.UUID;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final DashboardCategoryMapper dashboardCategoryMapper;
 
     @Override
-    public List<Category> listCategories() {
-        return categoryRepository.findAllWithPostCount();
+    public Optional<DashboardCategoryListPagingDto> getDashboardCategoryList(String name, int page, int size, String sortBy, String sortDirection) {
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Specification<Category> specification = Specification.where(CategorySpecification.hasName(name));
+
+        Page<Category> categoryPage = categoryRepository.findAll(specification, pageable);
+
+        List<DashboardCategoryListDto> categoryListDtos = categoryPage.stream()
+                .map(dashboardCategoryMapper::toCategoryListDto)
+                .toList();
+
+        long totalRecords = categoryRepository.count(specification);
+        int totalPages = categoryPage.getTotalPages();
+
+        DashboardCategoryListPagingDto dashboardCategoryListPagingDto = DashboardCategoryListPagingDto.builder()
+                .categories(categoryListDtos)
+                .totalRecords(totalRecords)
+                .totalPages(totalPages)
+                .build();
+
+        return Optional.of(dashboardCategoryListPagingDto);
     }
 
     @Override
-    @Transactional
-    public Category createCategory(Category category) {
-        if(categoryRepository.existsByNameIgnoreCase(category.getName())){
-            throw new IllegalArgumentException("Category with name " + category.getName() + " already exists");
+    public Optional<DashboardCategoryDto> getDashboardCategoryById(UUID id) {
+        Optional<Category> category = categoryRepository.findById(id);
+        if(category.isPresent()){
+            return Optional.of(dashboardCategoryMapper.toDto(category.get()));
         } else {
-            return categoryRepository.save(category);
+            throw new ResourceNotFoundException("Category with id " + id + " not found");
         }
     }
 
     @Override
     @Transactional
-    public Category updateCategory(Category category) {
-        Optional<Category> existingCategory = categoryRepository.findById(category.getId());
+    public Optional<DashboardCategoryDto> createCategory(DashboardCreateCategoryDto dashboardCreateCategoryDto) {
+        if(categoryRepository.existsByNameIgnoreCase(dashboardCreateCategoryDto.getName())){
+            throw new ResourceAlreadyExistsException("Category with name " + dashboardCreateCategoryDto.getName() + " already exists");
+        } else {
+            Category categoryToCreate = dashboardCategoryMapper.toEntity(dashboardCreateCategoryDto);
+            categoryRepository.save(categoryToCreate);
+
+            return Optional.of(dashboardCategoryMapper.toDto(categoryToCreate));
+        }
+    }
+
+    @Override
+    @Transactional
+    public Optional<DashboardCategoryDto> updateCategory(UUID id, DashboardUpdateCategoryDto dashboardUpdateCategoryDto) {
+        Optional<Category> existingCategory = categoryRepository.findById(id);
+
         if(existingCategory.isPresent()){
             Category updatedCategory = existingCategory.get();
-            updatedCategory.setName(category.getName());
-            return categoryRepository.save(updatedCategory);
+            updatedCategory.setName(dashboardUpdateCategoryDto.getName());
+            categoryRepository.save(updatedCategory);
+
+            return Optional.of(dashboardCategoryMapper.toDto(updatedCategory));
         } else {
-            throw new IllegalArgumentException("Category with id " + category.getId() + " not found");
+            throw new ResourceNotFoundException("Category with id " + id + " not found");
         }
     }
 
@@ -52,10 +100,10 @@ public class CategoryServiceImpl implements CategoryService {
             if (category.get().getPosts().isEmpty()) {
                 categoryRepository.deleteById(id);
             } else {
-                throw new IllegalArgumentException("Category with id " + id + " has posts");
+                throw new ResourceDeleteException("Category with id " + id + " cannot be deleted because it has posts");
             }
         } else {
-            throw new IllegalArgumentException("Category with id " + id + " not found");
+            throw new ResourceNotFoundException("Category with id " + id + " not found");
         }
     }
 }
