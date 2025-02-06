@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DashboardUpdateCategoryDto {
     @NotBlank(message = "Category name is required")
-    @Size(min = 2, max = 50, message = "Category name must be between 2 and 50 characters")
+    @Size(min = 3, max = 100, message = "Category name must be between 3 and 100 characters")
     @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Category name must contain only letters, numbers and spaces")
     private String name;
 }

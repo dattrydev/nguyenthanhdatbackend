@@ -3,6 +3,8 @@ package com.nguyenthanhdat.blog.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Objects;
@@ -10,7 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tags")
+@Table(name = "tags", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -22,6 +24,8 @@ public class Tag {
     private UUID id;
 
     @Column(nullable = false, unique = true)
+    @NotNull(message = "Tag name cannot be null")
+    @Size(min = 2, max = 100, message = "Tag name must be between 2 and 100 characters")
     private String name;
 
     @ManyToMany(mappedBy = "tags")

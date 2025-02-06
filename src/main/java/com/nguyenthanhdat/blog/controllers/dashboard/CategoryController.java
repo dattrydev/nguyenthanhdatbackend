@@ -58,7 +58,7 @@ public class CategoryController {
     }
 
     @PatchMapping(path = "/{id}")
-    public ResponseEntity<DashboardCategoryDto> updateCategory(@PathVariable UUID id, @RequestBody DashboardUpdateCategoryDto dashboardUpdateCategoryDto) {
+    public ResponseEntity<DashboardCategoryDto> updateCategory(@PathVariable UUID id, @Valid @RequestBody DashboardUpdateCategoryDto dashboardUpdateCategoryDto) {
         Optional<DashboardCategoryDto> categoryToUpdate = categoryService.updateCategory(id, dashboardUpdateCategoryDto);
 
         return new ResponseEntity<>(

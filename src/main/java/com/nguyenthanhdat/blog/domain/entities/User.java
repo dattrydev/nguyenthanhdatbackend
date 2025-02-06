@@ -1,6 +1,9 @@
 package com.nguyenthanhdat.blog.domain.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -21,12 +24,17 @@ public class User {
     private UUID id;
 
     @Column(nullable = false, unique = true)
+    @NotNull(message = "Email cannot be null")
+    @Email(message = "Email should be valid")
     private String email;
 
     @Column(nullable = false)
+    @NotNull(message = "Password cannot be null")
+    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
     private String password;
 
     @Column(nullable = false)
+    @NotNull(message = "Name cannot be null")
     private String name;
 
     @CreationTimestamp

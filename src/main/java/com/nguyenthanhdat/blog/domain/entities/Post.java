@@ -3,6 +3,8 @@ package com.nguyenthanhdat.blog.domain.entities;
 import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import com.nguyenthanhdat.blog.utils.SlugGenerator;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,19 +27,27 @@ public class Post {
     private UUID id;
 
     @Column(nullable = false)
+    @NotNull(message = "Post title cannot be null")
+    @Size(min = 3, max = 255, message = "Post title must be between 3 and 255 characters")
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
+    @NotNull(message = "Post content cannot be null")
+    @Lob
     private String content;
 
     @Column(nullable = false)
+    @NotNull(message = "Post status cannot be null")
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
     @Column(nullable = false)
+    @NotNull(message = "Reading time cannot be null")
     private Integer readingTime;
 
     @Column(nullable = false, unique = true)
+    @NotNull(message = "Post slug cannot be null")
+    @Size(min = 3, max = 100, message = "Post slug must be between 3 and 100 characters")
     private String slug;
 
     @ManyToOne(fetch = FetchType.LAZY)

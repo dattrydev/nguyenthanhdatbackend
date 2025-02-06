@@ -1,5 +1,6 @@
 package com.nguyenthanhdat.blog.controllers.dashboard;
 
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.ApiErrorResponseDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardCreatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListPagingDto;
@@ -7,14 +8,19 @@ import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto
 import com.nguyenthanhdat.blog.exceptions.ResourceCreationException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
 import com.nguyenthanhdat.blog.services.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/dashboard/v1/posts")
@@ -55,10 +61,9 @@ public class PostController {
         return ResponseEntity.ok(exists);
     }
 
-
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<DashboardPostDto> createPost(
-            @ModelAttribute DashboardCreatePostDto dashboardCreatePostDto,
+    public ResponseEntity<?> createPost(
+            @Valid @ModelAttribute DashboardCreatePostDto dashboardCreatePostDto,
             @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestParam(value = "contentImages", required = false) List<MultipartFile> contentImages
     ) {
@@ -68,9 +73,9 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<DashboardUpdatePostDto> updatePost(
+    public ResponseEntity<?> updatePost(
             @PathVariable UUID id,
-            @ModelAttribute DashboardUpdatePostDto postDto,
+            @Valid @ModelAttribute DashboardUpdatePostDto postDto,
             @RequestParam(value = "newThumbnail", required = false) MultipartFile newThumbnail,
             @RequestParam(value = "newContentImages", required = false) List<MultipartFile> newContentImages,
             @RequestParam(value = "oldThumbnail", required = false) String oldThumbnail,
@@ -80,5 +85,4 @@ public class PostController {
         return updatedPost.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
     }
-
 }
