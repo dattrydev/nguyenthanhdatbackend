@@ -24,7 +24,7 @@ public class CategoryController {
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {
         Optional<DashboardCategoryListPagingDto> dashboardCategoryListPagingDto = categoryService.getDashboardCategoryList(name, page ,size, sortBy, sortDirection);

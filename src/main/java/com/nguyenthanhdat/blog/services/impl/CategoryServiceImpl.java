@@ -11,6 +11,7 @@ import com.nguyenthanhdat.blog.services.CategoryService;
 import com.nguyenthanhdat.blog.specification.CategorySpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -95,15 +96,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(UUID id) {
-        Optional<Category> category = categoryRepository.findById(id);
-        if(category.isPresent()){
-            if (category.get().getPosts().isEmpty()) {
-                categoryRepository.deleteById(id);
-            } else {
-                throw new ResourceDeleteException("Category with id " + id + " cannot be deleted because it has posts");
-            }
-        } else {
-            throw new ResourceNotFoundException("Category with id " + id + " not found");
+        categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id " + id + " not found"));
+
+        try {
+            categoryRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new ResourceDeleteException("Cannot delete category with id " + id + " because it is referenced in another entity.");
+        } catch (Exception e) {
+            throw new ResourceDeleteException("Failed to delete category: " + id + ". Error: " + e.getMessage());
         }
     }
+
 }

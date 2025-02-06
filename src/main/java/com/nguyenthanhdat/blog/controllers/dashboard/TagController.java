@@ -29,7 +29,7 @@ public class TagController {
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {
         Optional<DashboardTagListPagingDto> tags = tagService.getDashboardTagList(name, page, size, sortBy, sortDirection);

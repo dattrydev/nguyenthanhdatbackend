@@ -11,6 +11,8 @@ import com.nguyenthanhdat.blog.services.TagService;
 import com.nguyenthanhdat.blog.specification.TagSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -96,9 +98,14 @@ public class TagServiceImpl implements TagService {
 
         try {
             tagRepository.delete(tag);
+        } catch (DataIntegrityViolationException e) {
+            throw new ResourceDeleteException("Cannot delete tag with id " + id + " because it is referenced in another entity.");
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResourceDeleteException("Cannot delete tag with id " + id + " because it does not exist.");
         } catch (Exception e) {
-            throw new ResourceDeleteException("Failed to delete tag: " + id);
+            throw new ResourceDeleteException("Failed to delete tag: " + id + ". Error: " + e.getMessage());
         }
     }
+
 
 }
