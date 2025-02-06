@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -27,22 +26,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = extractToken(request);
             if (token != null) {
                 UserDetails userDetails = authenticationService.validateToken(token);
+                if (userDetails != null) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                if (userDetails instanceof BlogUserDetails) {
-                    request.setAttribute("userId", ((BlogUserDetails) userDetails).getId());
+                    if (userDetails instanceof BlogUserDetails) {
+                        request.setAttribute("userId", ((BlogUserDetails) userDetails).getId());
+                    }
+                } else {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
+                    return;
                 }
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.warn("Failed to authenticate user", e);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+            return;
         }
 
         filterChain.doFilter(request, response);

@@ -7,6 +7,7 @@ import com.nguyenthanhdat.blog.security.JwtAuthenticationFilter;
 import com.nguyenthanhdat.blog.services.AuthenticationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SecurityConfig {
+
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationService authenticationService) {
         return new JwtAuthenticationFilter(authenticationService);
@@ -29,36 +31,32 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
-        BlogUserDetailsService blogUserDetailsService = new BlogUserDetailsService(userRepository);
-
-        String email = "user@test.com";
-        userRepository.findByEmail(email).ifPresentOrElse(
-                user -> {},
+        userRepository.findByEmail("user@test.com").ifPresentOrElse(
+                user -> {
+                },
                 () -> {
-                    User user = User.builder()
-                            .name("Test User")
-                            .email(email)
-                            .password(passwordEncoder().encode("password"))
-                            .build();
+                    User user = new User();
+                    user.setEmail("user@test.com");
+                    user.setPassword(passwordEncoder().encode("password"));
+                    user.setName("User");
                     userRepository.save(user);
                 }
         );
 
-        return blogUserDetailsService;
+        return new BlogUserDetailsService(userRepository);
     }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
-//                        .anyRequest().authenticated()
-                                .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/dashboard/v1/auth/login").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
@@ -75,6 +73,7 @@ public class SecurityConfig {
 
     @Configuration
     public static class WebConfig implements WebMvcConfigurer {
+
         @Override
         public void addCorsMappings(CorsRegistry registry) {
             registry.addMapping("/api/**")
@@ -85,3 +84,4 @@ public class SecurityConfig {
         }
     }
 }
+

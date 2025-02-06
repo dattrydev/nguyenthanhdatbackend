@@ -2,7 +2,6 @@ package com.nguyenthanhdat.blog.controllers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.LoginResponseDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.LoginRequestDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.user.UserDto;
 import com.nguyenthanhdat.blog.domain.entities.User;
 import com.nguyenthanhdat.blog.services.AuthenticationService;
 import com.nguyenthanhdat.blog.services.UserService;
@@ -28,31 +27,22 @@ public class AuthController {
             User user = userService.findUserByEmail(loginRequestDto.getEmail());
             if (user == null) {
                 log.warn("User not found: {}", loginRequestDto.getEmail());
-                throw new BadCredentialsException("Email or password is incorrect");
+                throw new BadCredentialsException("User not found");
             }
 
             var userDetails = authenticationService.authenticate(loginRequestDto.getEmail(), loginRequestDto.getPassword());
             String tokenValue = authenticationService.generateToken(userDetails);
-
-            UserDto userDto = UserDto.builder()
-                    .email(user.getEmail())
-                    .name(user.getName())
-                    .build();
-
-            LoginResponseDto loginResponseDto = LoginResponseDto.builder()
-                    .token(tokenValue)
-                    .expiresIn(86400)
-                    .user(userDto)
-                    .build();
+            LoginResponseDto loginResponseDto = authenticationService.generateLoginResponse(user, tokenValue);
 
             return ResponseEntity.ok(loginResponseDto);
 
         } catch (BadCredentialsException e) {
             log.error("Invalid credentials for email: {}", loginRequestDto.getEmail());
-            throw new BadCredentialsException("Email or password is incorrect");
+            throw new BadCredentialsException("Invalid credentials");
         } catch (Exception e) {
             log.error("Unexpected error during login", e);
-            throw new IllegalStateException("An unexpected error occurred");
+            throw new RuntimeException("Unexpected error");
         }
     }
+
 }

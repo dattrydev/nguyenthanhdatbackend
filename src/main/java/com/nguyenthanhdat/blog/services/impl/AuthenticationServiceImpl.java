@@ -1,5 +1,8 @@
 package com.nguyenthanhdat.blog.services.impl;
 
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.LoginResponseDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.user.UserDto;
+import com.nguyenthanhdat.blog.domain.entities.User;
 import com.nguyenthanhdat.blog.services.AuthenticationService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -28,6 +31,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Value("${jwt.secret}")
     private String secretKey;
 
+    @Value("${jwt.expiry-duration}")
+    private long jwtExpiryMs;
+
     @Override
     public UserDetails authenticate(String email, String password) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
@@ -37,7 +43,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        long jwtExpiryMs = 86400000L;
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
@@ -45,6 +50,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiryMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    @Override
+    public LoginResponseDto generateLoginResponse(User user, String tokenValue) {
+        UserDto userDto = UserDto.builder()
+                .email(user.getEmail())
+                .name(user.getName())
+                .build();
+
+        return LoginResponseDto.builder()
+                .token(tokenValue)
+                .expiresIn(86400)
+                .user(userDto)
+                .build();
     }
 
     @Override

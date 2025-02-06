@@ -2,7 +2,6 @@ package com.nguyenthanhdat.blog.controllers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.*;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
-import com.nguyenthanhdat.blog.mappers.dashboard.DashboardCategoryMapper;
 import com.nguyenthanhdat.blog.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,10 +49,10 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<DashboardCreateCategoryDto> createCategory(@Valid @RequestBody DashboardCreateCategoryDto dashboardCreateCategoryDto) {
+    public ResponseEntity<DashboardCategoryDto> createCategory(@Valid @RequestBody DashboardCreateCategoryDto dashboardCreateCategoryDto) {
         Optional<DashboardCategoryDto> savedCategory = categoryService.createCategory(dashboardCreateCategoryDto);
 
-        return savedCategory.map(category -> ResponseEntity.status(HttpStatus.CREATED).body(dashboardCreateCategoryDto))
+        return savedCategory.map(category -> ResponseEntity.status(HttpStatus.CREATED).body(category))
                 .orElseThrow(() -> new ResourceNotFoundException("Category could not be created"));
     }
 
