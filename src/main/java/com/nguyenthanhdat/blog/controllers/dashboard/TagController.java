@@ -27,11 +27,12 @@ public class TagController {
     @GetMapping
     public ResponseEntity<DashboardTagListPagingDto> getDashboardTagList(
             @RequestParam(required = false) String name,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {
+        page = page - 1;
         Optional<DashboardTagListPagingDto> tags = tagService.getDashboardTagList(name, page, size, sortBy, sortDirection);
 
         return tags.map(ResponseEntity::ok)

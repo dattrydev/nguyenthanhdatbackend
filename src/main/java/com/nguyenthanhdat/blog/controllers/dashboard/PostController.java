@@ -34,12 +34,12 @@ public class PostController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Integer readingTime,
             @RequestParam(required = false) String category,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {
-
+        page = page - 1;
         Optional<DashboardPostListPagingDto> response = postService.getDashboardPostList(title, status, readingTime, category, page, size, sortBy, sortDirection);
 
         return response.map(ResponseEntity::ok)

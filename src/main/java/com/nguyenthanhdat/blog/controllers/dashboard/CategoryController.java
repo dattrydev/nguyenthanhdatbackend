@@ -20,12 +20,13 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<DashboardCategoryListPagingDto> getDashboardCategoryList(
-            @RequestParam(required = false) String name,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @Valid @RequestParam(required = false) String name,
+            @Valid @RequestParam(defaultValue = "1") int page,
+            @Valid @RequestParam(defaultValue = "10") int size,
+            @Valid @RequestParam(defaultValue = "name") String sortBy,
+            @Valid @RequestParam(defaultValue = "desc") String sortDirection
     ) {
+        page = page - 1;
         Optional<DashboardCategoryListPagingDto> dashboardCategoryListPagingDto = categoryService.getDashboardCategoryList(name, page ,size, sortBy, sortDirection);
 
         return dashboardCategoryListPagingDto.map(ResponseEntity::ok)

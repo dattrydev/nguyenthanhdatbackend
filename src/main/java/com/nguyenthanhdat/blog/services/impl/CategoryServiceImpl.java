@@ -32,6 +32,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Optional<DashboardCategoryListPagingDto> getDashboardCategoryList(String name, int page, int size, String sortBy, String sortDirection) {
+        if (page < 0) {
+            throw new IllegalArgumentException("Page number must be greater than 0");
+        }
+
         Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
@@ -50,6 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .categories(categoryListDtos)
                 .totalRecords(totalRecords)
                 .totalPages(totalPages)
+                .currentPage(page + 1)
                 .build();
 
         return Optional.of(dashboardCategoryListPagingDto);

@@ -33,6 +33,10 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Optional<DashboardTagListPagingDto> getDashboardTagList(String name, int page, int size, String sortBy, String sortDirection) {
+        if (page < 0) {
+            throw new IllegalArgumentException("Page number must be greater than 0");
+        }
+
         Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
@@ -51,7 +55,7 @@ public class TagServiceImpl implements TagService {
                 .tags(tagListDtos)
                 .totalRecords(totalRecords)
                 .totalPages(totalPages)
-                .currentPage(page)
+                .currentPage(page + 1)
                 .build();
 
         return Optional.of(dashboardTagListPagingDto);
