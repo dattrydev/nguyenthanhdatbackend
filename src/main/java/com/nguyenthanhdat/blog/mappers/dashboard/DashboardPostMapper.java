@@ -29,22 +29,4 @@ public interface DashboardPostMapper {
                         .collect(Collectors.joining(", ")))
                 .build();
     }
-
-    default DashboardUpdatePostDto toUpdatePostDto(Post post) {
-        if (post == null) return null;
-
-        return DashboardUpdatePostDto.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .status(post.getStatus())
-                .readingTime(post.getReadingTime())
-                .slug(post.getSlug())
-                .category_id(post.getCategory().getId())
-                .tag_ids(post.getTags().stream()
-                        .map(Tag::getId)
-                        .collect(Collectors.toSet()))
-                .thumbnailUrl(post.getThumbnailUrl())
-                .contentImages(post.getContentImages())
-                .build();
-    }
 }
