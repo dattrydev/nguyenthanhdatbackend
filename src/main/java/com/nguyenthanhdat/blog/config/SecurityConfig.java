@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/dashboard/v1/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
+                .cors(cors -> cors.configure(http))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable);
@@ -72,16 +73,17 @@ public class SecurityConfig {
     }
 
     @Configuration
-    public static class WebConfig implements WebMvcConfigurer {
+    public class WebConfig implements WebMvcConfigurer {
 
         @Override
         public void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping("/api/**")
+            registry.addMapping("/**")
                     .allowedOrigins("http://localhost:3000")
-                    .allowedMethods("GET", "POST", "PUT", "DELETE")
+                    .allowedMethods("*")
                     .allowedHeaders("*")
                     .allowCredentials(true);
         }
     }
+
 }
 

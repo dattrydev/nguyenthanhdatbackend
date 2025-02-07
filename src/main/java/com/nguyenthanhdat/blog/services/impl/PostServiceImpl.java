@@ -16,6 +16,7 @@ import com.nguyenthanhdat.blog.services.FileStorageService;
 import com.nguyenthanhdat.blog.services.PostService;
 import com.nguyenthanhdat.blog.specification.PostSpecification;
 import com.nguyenthanhdat.blog.utils.PresignedUrl;
+import com.nguyenthanhdat.blog.utils.ReadingTime;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -117,11 +118,13 @@ public class PostServiceImpl implements PostService {
                         .orElseThrow(() -> new ResourceNotFoundException("Tag with ID '" + tagId + "' not found.")))
                 .collect(Collectors.toSet());
 
+        int readingTime = ReadingTime.calculateReadingTime(dashboardCreatePostDto.getContent());
+
         Post post = Post.builder()
                 .title(title)
                 .slug(generatedSlug)
                 .content(dashboardCreatePostDto.getContent())
-                .readingTime(dashboardCreatePostDto.getReadingTime())
+                .readingTime(readingTime)
                 .status(dashboardCreatePostDto.getStatus())
                 .category(category)
                 .tags(tags)
@@ -152,44 +155,54 @@ public class PostServiceImpl implements PostService {
 
         post = postRepository.save(post);
 
-        return Optional.of(post)
-                .map(dashboardPostMapper::toDto);
+        UUID postId = post.getId();
+
+        return Optional.of(dashboardPostMapper.toDto(post)).map(dto -> {
+            dto.setId(postId);
+            return dto;
+        });
     }
 
     @Override
     @Transactional
-    public Optional<DashboardUpdatePostDto> updatePost(UUID id, DashboardUpdatePostDto dashboardUpdatePostDto, MultipartFile newThumbnail,
-                           List<MultipartFile> newContentImages, String oldThumbnail,
-                           List<String> oldContentImages) {
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (optionalPost.isEmpty()) {
-            throw new ResourceNotFoundException("Post " + id + " not found");
+    public Optional<DashboardPostDto> updatePost(UUID id, DashboardUpdatePostDto dashboardUpdatePostDto, MultipartFile newThumbnail,
+                                                 List<MultipartFile> newContentImages, String oldThumbnail,
+                                                 List<String> oldContentImages) {
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
+
+        if (dashboardUpdatePostDto.getTitle() != null) {
+            post.setTitle(dashboardUpdatePostDto.getTitle());
+        }
+        if (dashboardUpdatePostDto.getContent() != null) {
+            post.setContent(dashboardUpdatePostDto.getContent());
+            post.setReadingTime(ReadingTime.calculateReadingTime(dashboardUpdatePostDto.getContent()));
+        }
+        if (dashboardUpdatePostDto.getStatus() != null) {
+            post.setStatus(dashboardUpdatePostDto.getStatus());
         }
 
-        Post post = optionalPost.get();
+        if (dashboardUpdatePostDto.getCategory_id() != null) {
+            Category category = categoryRepository.findById(dashboardUpdatePostDto.getCategory_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category " + dashboardUpdatePostDto.getCategory_id() + " not found"));
+            post.setCategory(category);
+        }
 
-        post.setTitle(dashboardUpdatePostDto.getTitle());
-        post.setContent(dashboardUpdatePostDto.getContent());
-        post.setReadingTime(dashboardUpdatePostDto.getReadingTime());
-        post.setStatus(dashboardUpdatePostDto.getStatus());
-
-        Category category = categoryRepository.findById(dashboardUpdatePostDto.getCategory_id())
-                .orElseThrow(() -> new ResourceNotFoundException("Category " + dashboardUpdatePostDto.getCategory_id() + " not found"));
-        post.setCategory(category);
-
-        Set<Tag> tags = dashboardUpdatePostDto.getTag_ids().stream()
-                .map(tag_id -> tagRepository.findById(tag_id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Tag " + tag_id + " not found")))
-                .collect(Collectors.toSet());
-        post.setTags(tags);
+        if (dashboardUpdatePostDto.getTag_ids() != null && !dashboardUpdatePostDto.getTag_ids().isEmpty()) {
+            Set<Tag> tags = dashboardUpdatePostDto.getTag_ids().stream()
+                    .map(tag_id -> tagRepository.findById(tag_id)
+                            .orElseThrow(() -> new ResourceNotFoundException("Tag " + tag_id + " not found")))
+                    .collect(Collectors.toSet());
+            post.setTags(tags);
+        }
 
         if (newThumbnail != null && !newThumbnail.isEmpty()) {
             if (post.getThumbnailUrl() != null && !post.getThumbnailUrl().equals(oldThumbnail)) {
                 fileStorageService.deleteFile(post.getThumbnailUrl());
             }
-            String thumbnailUrl = fileStorageService.uploadFile(newThumbnail);
-            post.setThumbnailUrl(thumbnailUrl);
-        } else {
+            post.setThumbnailUrl(fileStorageService.uploadFile(newThumbnail));
+        } else if (oldThumbnail != null) {
             post.setThumbnailUrl(oldThumbnail);
         }
 
@@ -201,7 +214,6 @@ public class PostServiceImpl implements PostService {
                 }
             }
         }
-
         if (oldContentImages != null) {
             newImageUrls.addAll(oldContentImages);
         }
@@ -214,9 +226,14 @@ public class PostServiceImpl implements PostService {
 
         post.setContentImages(newImageUrls);
 
-        postRepository.save(post);
+        post = postRepository.save(post);
 
-        return Optional.of(dashboardPostMapper.toUpdatePostDto(post));
+        UUID postId = post.getId();
+
+        return Optional.of(dashboardPostMapper.toDto(post)).map(dto -> {
+            dto.setId(postId);
+            return dto;
+        });
     }
 
     @Override

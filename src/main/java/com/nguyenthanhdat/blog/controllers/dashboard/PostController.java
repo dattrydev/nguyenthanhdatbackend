@@ -62,7 +62,7 @@ public class PostController {
     }
 
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<?> createPost(
+    public ResponseEntity<DashboardPostDto> createPost(
             @Valid @ModelAttribute DashboardCreatePostDto dashboardCreatePostDto,
             @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestParam(value = "contentImages", required = false) List<MultipartFile> contentImages
@@ -73,7 +73,7 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updatePost(
+    public ResponseEntity<DashboardPostDto> updatePost(
             @PathVariable UUID id,
             @Valid @ModelAttribute DashboardUpdatePostDto postDto,
             @RequestParam(value = "newThumbnail", required = false) MultipartFile newThumbnail,
@@ -81,7 +81,7 @@ public class PostController {
             @RequestParam(value = "oldThumbnail", required = false) String oldThumbnail,
             @RequestParam(value = "oldContentImages", required = false) List<String> oldContentImages
     ) {
-        Optional<DashboardUpdatePostDto> updatedPost = postService.updatePost(id, postDto, newThumbnail, newContentImages, oldThumbnail, oldContentImages);
+        Optional<DashboardPostDto> updatedPost = postService.updatePost(id, postDto, newThumbnail, newContentImages, oldThumbnail, oldContentImages);
         return updatedPost.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
     }

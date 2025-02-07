@@ -2,16 +2,22 @@ package com.nguyenthanhdat.blog.controllers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.LoginResponseDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.LoginRequestDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.auth.ValidateResponseDto;
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.user.UserDto;
 import com.nguyenthanhdat.blog.domain.entities.User;
 import com.nguyenthanhdat.blog.services.AuthenticationService;
 import com.nguyenthanhdat.blog.services.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/dashboard/v1/auth")
@@ -42,6 +48,61 @@ public class AuthController {
         } catch (Exception e) {
             log.error("Unexpected error during login", e);
             throw new RuntimeException("Unexpected error");
+        }
+    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<ValidateResponseDto> validateToken(@RequestHeader(value = "Authorization", required = false) String token) {
+        if (token == null || token.isBlank()) {
+            return ResponseEntity.status(401).body(
+                    ValidateResponseDto.builder()
+                            .message("Token not provided")
+                            .build()
+            );
+        }
+
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+
+            UserDetails userDetails = authenticationService.validateToken(token);
+            if (userDetails == null) {
+                return ResponseEntity.status(401).body(
+                        ValidateResponseDto.builder()
+                                .message("Invalid token")
+                                .build()
+                );
+            }
+
+
+            return ResponseEntity.ok(
+                    ValidateResponseDto.builder()
+                            .message("Token is valid")
+                            .user(
+                                    UserDto.builder()
+                                    .email(userDetails.getUsername())
+                                    .build())
+                            .build()
+            );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(401).body(
+                    ValidateResponseDto.builder()
+                            .message("Token expired")
+                            .build()
+            );
+        } catch (MalformedJwtException | SignatureException e) {
+            return ResponseEntity.status(401).body(
+                    ValidateResponseDto.builder()
+                            .message("Invalid token")
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(
+                    ValidateResponseDto.builder()
+                            .message("Unexpected error")
+                            .build()
+            );
         }
     }
 

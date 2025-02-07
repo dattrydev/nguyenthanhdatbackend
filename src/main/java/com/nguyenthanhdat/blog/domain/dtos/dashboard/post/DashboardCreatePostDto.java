@@ -28,8 +28,6 @@ public class DashboardCreatePostDto {
     @NotNull(message = "Post status cannot be null")
     private PostStatus status;
 
-    @Min(value = 1, message = "Reading time must be at least 1 minute")
-    @Max(value = 1000, message = "Reading time must be less than or equal to 1000 minutes")
     private Integer readingTime;
 
     @NotNull(message = "Category ID cannot be null")
