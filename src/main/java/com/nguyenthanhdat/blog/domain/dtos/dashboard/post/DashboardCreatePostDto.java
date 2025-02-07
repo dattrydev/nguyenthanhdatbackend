@@ -28,8 +28,6 @@ public class DashboardCreatePostDto {
     @NotNull(message = "Post status cannot be null")
     private PostStatus status;
 
-    private Integer readingTime;
-
     @NotNull(message = "Category ID cannot be null")
     private UUID category_id;
 
