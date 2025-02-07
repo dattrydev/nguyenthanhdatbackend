@@ -1,6 +1,7 @@
 package com.nguyenthanhdat.blog.utils;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -19,7 +20,10 @@ public class PresignedUrl {
     private final Region region;
     private final AwsCredentialsProvider credentialsProvider;
 
-    public String createPresignedGetUrl(String bucketName, String keyName) {
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
+
+    public String createPresignedGetUrl(String keyName) {
         try (S3Presigner presigner = S3Presigner.builder()
                 .region(region)
                 .credentialsProvider(credentialsProvider)

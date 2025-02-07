@@ -1,9 +1,10 @@
 package com.nguyenthanhdat.blog.controllers.dashboard;
 
+import com.nguyenthanhdat.blog.domain.dtos.dashboard.image.ImageResponseDto;
 import com.nguyenthanhdat.blog.exceptions.FileUploadException;
 import com.nguyenthanhdat.blog.services.FileStorageService;
+import com.nguyenthanhdat.blog.utils.PresignedUrl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,17 +12,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/dashboard/v1/uploads")
 @RequiredArgsConstructor
 public class UploadController {
     private final FileStorageService fileStorageService;
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    private final PresignedUrl presignedUrl;
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
 
     @PostMapping("/image")
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
+    public ResponseEntity<ImageResponseDto> uploadImage(@RequestParam("image") MultipartFile file) {
         try {
             if (file.isEmpty()) {
                 throw new FileUploadException("Please select a file to upload.");
@@ -39,11 +39,13 @@ public class UploadController {
             }
 
             String imageUrl = fileStorageService.uploadFile(file);
-            return ResponseEntity.ok(Map.of("url", imageUrl));
-        } catch (FileUploadException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            String tempImageUrl = presignedUrl.createPresignedGetUrl(imageUrl);
+            return ResponseEntity.ok(ImageResponseDto.builder()
+                    .url(imageUrl)
+                    .tempUrl(tempImageUrl)
+                    .build());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to upload file: " + e.getMessage()));
+            throw new FileUploadException(e.getMessage());
         }
     }
 }

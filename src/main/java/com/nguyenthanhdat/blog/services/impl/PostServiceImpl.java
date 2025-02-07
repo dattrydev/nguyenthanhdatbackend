@@ -19,7 +19,6 @@ import com.nguyenthanhdat.blog.utils.PresignedUrl;
 import com.nguyenthanhdat.blog.utils.ReadingTime;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,9 +41,6 @@ public class PostServiceImpl implements PostService {
     private final TagRepository tagRepository;
     private final FileStorageService fileStorageService;
     private final PresignedUrl presignedUrl;
-
-    @Value("${aws.s3.bucket-name}")
-    private String bucketName;
 
     @Override
     public Optional<DashboardPostListPagingDto> getDashboardPostList(String title, String status, Integer readingTime, String category, int page, int size, String sortBy, String sortDirection) {
@@ -80,14 +76,14 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findBySlug(slug);
         if (post != null) {
             if (post.getThumbnailUrl() != null) {
-                String thumbnailUrl = presignedUrl.createPresignedGetUrl(bucketName, post.getThumbnailUrl());
+                String thumbnailUrl = presignedUrl.createPresignedGetUrl(post.getThumbnailUrl());
                 post.setThumbnailUrl(thumbnailUrl);
             }
 
             if (post.getContentImages() != null) {
                 Set<String> contentImages = new HashSet<>();
                 for (String imageUrl : post.getContentImages()) {
-                    contentImages.add(presignedUrl.createPresignedGetUrl(bucketName, imageUrl));
+                    contentImages.add(presignedUrl.createPresignedGetUrl(imageUrl));
                 }
                 post.setContentImages(contentImages);
             }
