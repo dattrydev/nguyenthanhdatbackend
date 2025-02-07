@@ -24,6 +24,4 @@ public class DashboardPostDto {
     private String slug;
     private DashboardCategoryDto category;
     private Set<DashboardTagDto> tags;
-    private String thumbnailUrl;
-    private Set<String> contentImages;
 }

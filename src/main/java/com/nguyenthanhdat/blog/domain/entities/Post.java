@@ -33,7 +33,6 @@ public class Post {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     @NotNull(message = "Post content cannot be null")
-    @Lob
     private String content;
 
     @Column(nullable = false)
@@ -61,14 +60,6 @@ public class Post {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<Tag> tags;
-
-    @Column()
-    private String thumbnailUrl;
-
-    @ElementCollection
-    @CollectionTable(name = "post_content_images", joinColumns = @JoinColumn(name = "post_id"))
-    @Column(name = "image_url")
-    private Set<String> contentImages;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

@@ -15,7 +15,7 @@ public interface PostService {
 
     Optional<DashboardPostDto> getPostBySlug(String slug);
 
-    Optional<DashboardPostDto> createPost(DashboardCreatePostDto dashboardCreatePostDto, MultipartFile thumbnail, List<MultipartFile> contentImages);
+    Optional<DashboardPostDto> createPost(DashboardCreatePostDto dashboardCreatePostDto);
 
     Optional<DashboardPostDto> updatePost(UUID id, DashboardUpdatePostDto postDto, MultipartFile newThumbnail, List<MultipartFile> newContentImages, String oldThumbnail, List<String> oldContentImages);
 

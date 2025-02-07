@@ -78,20 +78,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public Optional<DashboardPostDto> getPostBySlug(String slug) {
         Post post = postRepository.findBySlug(slug);
-        if (post != null) {
-            if (post.getThumbnailUrl() != null) {
-                String thumbnailUrl = presignedUrl.createPresignedGetUrl(post.getThumbnailUrl());
-                post.setThumbnailUrl(thumbnailUrl);
-            }
-
-            if (post.getContentImages() != null) {
-                Set<String> contentImages = new HashSet<>();
-                for (String imageUrl : post.getContentImages()) {
-                    contentImages.add(presignedUrl.createPresignedGetUrl(imageUrl));
-                }
-                post.setContentImages(contentImages);
-            }
-        }
 
         return Optional.ofNullable(post)
                 .map(dashboardPostMapper::toDto);
@@ -99,7 +85,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Optional<DashboardPostDto> createPost(DashboardCreatePostDto dashboardCreatePostDto, MultipartFile thumbnail, List<MultipartFile> contentImages) {
+    public Optional<DashboardPostDto> createPost(DashboardCreatePostDto dashboardCreatePostDto) {
         String title = dashboardCreatePostDto.getTitle();
         if (postRepository.existsByTitle(title)) {
             throw new ResourceAlreadyExistsException("Post with title '" + title + "' already exists.");
@@ -129,29 +115,6 @@ public class PostServiceImpl implements PostService {
                 .category(category)
                 .tags(tags)
                 .build();
-
-        if (thumbnail != null && !thumbnail.isEmpty()) {
-            try {
-                String thumbnailUrl = fileStorageService.uploadFile(thumbnail);
-                post.setThumbnailUrl(thumbnailUrl);
-            } catch (Exception e) {
-                throw new FileUploadException("Error uploading thumbnail: " + e.getMessage());
-            }
-        }
-
-        if (contentImages != null && !contentImages.isEmpty()) {
-            Set<String> imageUrls = new HashSet<>();
-            for (MultipartFile image : contentImages) {
-                if (!image.isEmpty()) {
-                    try {
-                        imageUrls.add(fileStorageService.uploadFile(image));
-                    } catch (Exception e) {
-                        throw new FileUploadException("Error uploading content images: " + e.getMessage());
-                    }
-                }
-            }
-            post.setContentImages(imageUrls);
-        }
 
         post = postRepository.save(post);
 
@@ -196,35 +159,6 @@ public class PostServiceImpl implements PostService {
                     .collect(Collectors.toSet());
             post.setTags(tags);
         }
-
-        if (newThumbnail != null && !newThumbnail.isEmpty()) {
-            if (post.getThumbnailUrl() != null && !post.getThumbnailUrl().equals(oldThumbnail)) {
-                fileStorageService.deleteFile(post.getThumbnailUrl());
-            }
-            post.setThumbnailUrl(fileStorageService.uploadFile(newThumbnail));
-        } else if (oldThumbnail != null) {
-            post.setThumbnailUrl(oldThumbnail);
-        }
-
-        Set<String> newImageUrls = new HashSet<>();
-        if (newContentImages != null && !newContentImages.isEmpty()) {
-            for (MultipartFile image : newContentImages) {
-                if (!image.isEmpty()) {
-                    newImageUrls.add(fileStorageService.uploadFile(image));
-                }
-            }
-        }
-        if (oldContentImages != null) {
-            newImageUrls.addAll(oldContentImages);
-        }
-
-        Set<String> imagesToDelete = new HashSet<>(post.getContentImages());
-        imagesToDelete.removeAll(newImageUrls);
-        for (String oldImageUrl : imagesToDelete) {
-            fileStorageService.deleteFile(oldImageUrl);
-        }
-
-        post.setContentImages(newImageUrls);
 
         post = postRepository.save(post);
 

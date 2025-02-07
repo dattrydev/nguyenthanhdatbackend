@@ -33,8 +33,4 @@ public class DashboardCreatePostDto {
 
     @NotEmpty(message = "At least one tag is required")
     private Set<UUID> tag_ids;
-
-    private String thumbnailUrl;
-
-    private Set<MultipartFile> contentImages;
 }

@@ -61,13 +61,11 @@ public class PostController {
         return ResponseEntity.ok(exists);
     }
 
-    @PostMapping(consumes = "multipart/form-data")
+    @PostMapping
     public ResponseEntity<DashboardPostDto> createPost(
-            @Valid @ModelAttribute DashboardCreatePostDto dashboardCreatePostDto,
-            @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
-            @RequestParam(value = "contentImages", required = false) List<MultipartFile> contentImages
+            @Valid @RequestBody DashboardCreatePostDto dashboardCreatePostDto
     ) {
-        Optional<DashboardPostDto> savedPost = postService.createPost(dashboardCreatePostDto, thumbnail, contentImages);
+        Optional<DashboardPostDto> savedPost = postService.createPost(dashboardCreatePostDto);
         return savedPost.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceCreationException("Failed to create post"));
     }
