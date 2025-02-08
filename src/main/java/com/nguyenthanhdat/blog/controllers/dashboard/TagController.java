@@ -51,7 +51,7 @@ public class TagController {
             @RequestParam String field,
             @RequestParam String value) {
         boolean exists = tagService.isFieldExists(field, value);
-        return ResponseEntity.ok(exists);
+        return ResponseEntity.ok(!exists);
     }
 
     @PostMapping

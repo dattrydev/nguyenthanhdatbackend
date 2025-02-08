@@ -58,7 +58,7 @@ public class PostController {
             @RequestParam String field,
             @RequestParam String value) {
         boolean exists = postService.isFieldExists(field, value);
-        return ResponseEntity.ok(exists);
+        return ResponseEntity.ok(!exists);
     }
 
     @PostMapping

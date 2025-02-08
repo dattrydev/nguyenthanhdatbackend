@@ -46,7 +46,7 @@ public class CategoryController {
             @RequestParam String field,
             @RequestParam String value) {
         boolean exists = categoryService.isFieldExists(field, value);
-        return ResponseEntity.ok(exists);
+        return ResponseEntity.ok(!exists);
     }
 
     @PostMapping
