@@ -5,7 +5,6 @@ import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
-import com.nguyenthanhdat.blog.exceptions.FileUploadException;
 import com.nguyenthanhdat.blog.exceptions.ResourceAlreadyExistsException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
@@ -25,12 +24,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.nguyenthanhdat.blog.utils.GenerateSlug.generateSlug;
+import static com.nguyenthanhdat.blog.utils.SlugGenerator.generateSlug;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +37,6 @@ public class PostServiceImpl implements PostService {
     private final DashboardPostMapper dashboardPostMapper;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
-    private final FileStorageService fileStorageService;
     private final PresignedUrl presignedUrl;
 
     @Override
@@ -79,7 +76,11 @@ public class PostServiceImpl implements PostService {
     public Optional<DashboardPostDto> getPostBySlug(String slug) {
         Post post = postRepository.findBySlug(slug);
 
-        return Optional.ofNullable(post)
+        String convertedContent = presignedUrl.convertKeyToPresignedUrl(post.getContent());
+
+        post.setContent(convertedContent);
+
+        return Optional.of(post)
                 .map(dashboardPostMapper::toDto);
     }
 
@@ -128,18 +129,21 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Optional<DashboardPostDto> updatePost(UUID id, DashboardUpdatePostDto dashboardUpdatePostDto, MultipartFile newThumbnail,
-                                                 List<MultipartFile> newContentImages, String oldThumbnail,
-                                                 List<String> oldContentImages) {
+    public Optional<DashboardPostDto> updatePost(UUID id, DashboardUpdatePostDto dashboardUpdatePostDto) {
 
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
+        System.out.println("dashboardUpdatePostDto: " + dashboardUpdatePostDto);
+
+        String convertedContent = presignedUrl.convertPresignedUrlToKey(dashboardUpdatePostDto.getContent());
+
+        System.out.println("convertedContent: " + convertedContent);
 
         if (dashboardUpdatePostDto.getTitle() != null) {
             post.setTitle(dashboardUpdatePostDto.getTitle());
         }
         if (dashboardUpdatePostDto.getContent() != null) {
-            post.setContent(dashboardUpdatePostDto.getContent());
+            post.setContent(convertedContent);
             post.setReadingTime(ReadingTime.calculateReadingTime(dashboardUpdatePostDto.getContent()));
         }
         if (dashboardUpdatePostDto.getStatus() != null) {

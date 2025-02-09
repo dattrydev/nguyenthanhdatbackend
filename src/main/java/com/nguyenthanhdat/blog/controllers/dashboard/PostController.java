@@ -1,6 +1,5 @@
 package com.nguyenthanhdat.blog.controllers.dashboard;
 
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.ApiErrorResponseDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardCreatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListPagingDto;
@@ -10,17 +9,11 @@ import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
 import com.nguyenthanhdat.blog.services.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/dashboard/v1/posts")
@@ -73,13 +66,9 @@ public class PostController {
     @PatchMapping("/{id}")
     public ResponseEntity<DashboardPostDto> updatePost(
             @PathVariable UUID id,
-            @Valid @ModelAttribute DashboardUpdatePostDto postDto,
-            @RequestParam(value = "newThumbnail", required = false) MultipartFile newThumbnail,
-            @RequestParam(value = "newContentImages", required = false) List<MultipartFile> newContentImages,
-            @RequestParam(value = "oldThumbnail", required = false) String oldThumbnail,
-            @RequestParam(value = "oldContentImages", required = false) List<String> oldContentImages
+            @Valid @RequestBody DashboardUpdatePostDto postDto
     ) {
-        Optional<DashboardPostDto> updatedPost = postService.updatePost(id, postDto, newThumbnail, newContentImages, oldThumbnail, oldContentImages);
+        Optional<DashboardPostDto> updatedPost = postService.updatePost(id, postDto);
         return updatedPost.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
     }

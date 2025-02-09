@@ -85,7 +85,7 @@ public class Post {
     @PreUpdate
     protected void generateSlug() {
         if (slug == null || slug.isEmpty()) {
-            slug = SlugGenerator.toSlug(title);
+            slug = SlugGenerator.generateSlug(title);
         }
     }
 }
