@@ -17,5 +17,7 @@ public interface PostService {
 
     Optional<DashboardPostDto> updatePost(UUID id, DashboardUpdatePostDto postDto);
 
+    void deletePost(UUID id);
+
     boolean isFieldExists(String field, String value);
 }

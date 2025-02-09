@@ -72,4 +72,11 @@ public class PostController {
         return updatedPost.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable UUID id) {
+        postService.deletePost(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

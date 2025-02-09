@@ -174,6 +174,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
+    public void deletePost(UUID id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
+        postRepository.delete(post);
+    }
+
+
+    @Override
     public boolean isFieldExists(String field, String value) {
         switch (field.toLowerCase()) {
             case "title":
