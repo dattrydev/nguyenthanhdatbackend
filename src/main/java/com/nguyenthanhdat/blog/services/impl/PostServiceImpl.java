@@ -11,7 +11,6 @@ import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
 import com.nguyenthanhdat.blog.repositories.CategoryRepository;
 import com.nguyenthanhdat.blog.repositories.PostRepository;
 import com.nguyenthanhdat.blog.repositories.TagRepository;
-import com.nguyenthanhdat.blog.services.FileStorageService;
 import com.nguyenthanhdat.blog.services.PostService;
 import com.nguyenthanhdat.blog.specification.PostSpecification;
 import com.nguyenthanhdat.blog.utils.PresignedUrl;
@@ -100,7 +99,7 @@ public class PostServiceImpl implements PostService {
         Category category = categoryRepository.findById(dashboardCreatePostDto.getCategory_id())
                 .orElseThrow(() -> new ResourceNotFoundException("Category with ID '" + dashboardCreatePostDto.getCategory_id() + "' not found."));
 
-        Set<Tag> tags = dashboardCreatePostDto.getTag_ids().stream()
+        Set<Tag> tags = dashboardCreatePostDto.getTags_id().stream()
                 .map(tagId -> tagRepository.findById(tagId)
                         .orElseThrow(() -> new ResourceNotFoundException("Tag with ID '" + tagId + "' not found.")))
                 .collect(Collectors.toSet());
@@ -156,8 +155,8 @@ public class PostServiceImpl implements PostService {
             post.setCategory(category);
         }
 
-        if (dashboardUpdatePostDto.getTag_ids() != null && !dashboardUpdatePostDto.getTag_ids().isEmpty()) {
-            Set<Tag> tags = dashboardUpdatePostDto.getTag_ids().stream()
+        if (dashboardUpdatePostDto.getTags_id() != null && !dashboardUpdatePostDto.getTags_id().isEmpty()) {
+            Set<Tag> tags = dashboardUpdatePostDto.getTags_id().stream()
                     .map(tag_id -> tagRepository.findById(tag_id)
                             .orElseThrow(() -> new ResourceNotFoundException("Tag " + tag_id + " not found")))
                     .collect(Collectors.toSet());

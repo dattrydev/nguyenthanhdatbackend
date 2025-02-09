@@ -28,7 +28,7 @@ public class DashboardUpdatePostDto {
 
     private UUID category_id;
 
-    private Set<UUID> tag_ids;
+    private Set<UUID> tags_id;
 
     private String thumbnailUrl;
 

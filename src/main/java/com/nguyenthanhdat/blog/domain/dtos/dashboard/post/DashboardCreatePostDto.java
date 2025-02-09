@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 import java.util.UUID;
@@ -32,5 +31,5 @@ public class DashboardCreatePostDto {
     private UUID category_id;
 
     @NotEmpty(message = "At least one tag is required")
-    private Set<UUID> tag_ids;
+    private Set<UUID> tags_id;
 }
