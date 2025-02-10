@@ -7,7 +7,6 @@ import lombok.experimental.SuperBuilder;
 @RequiredArgsConstructor
 @SuperBuilder
 public class PaginationDto {
-    protected long totalRecords;
     protected int totalPages;
     protected int currentPage;
 }

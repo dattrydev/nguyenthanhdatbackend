@@ -63,7 +63,6 @@ public class PostServiceImpl implements PostService {
 
         DashboardPostListPagingDto dashboardPostListPagingDto = DashboardPostListPagingDto.builder()
                 .posts(postDtos)
-                .totalRecords(totalRecords)
                 .totalPages(totalPages)
                 .currentPage(page + 1)
                 .build();

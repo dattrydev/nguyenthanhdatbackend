@@ -52,7 +52,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         DashboardCategoryListPagingDto dashboardCategoryListPagingDto = DashboardCategoryListPagingDto.builder()
                 .categories(categoryListDtos)
-                .totalRecords(totalRecords)
                 .totalPages(totalPages)
                 .currentPage(page + 1)
                 .build();

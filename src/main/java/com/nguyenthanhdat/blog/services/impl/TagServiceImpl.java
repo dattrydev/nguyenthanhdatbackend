@@ -53,7 +53,6 @@ public class TagServiceImpl implements TagService {
 
         DashboardTagListPagingDto dashboardTagListPagingDto = DashboardTagListPagingDto.builder()
                 .tags(tagListDtos)
-                .totalRecords(totalRecords)
                 .totalPages(totalPages)
                 .currentPage(page + 1)
                 .build();
