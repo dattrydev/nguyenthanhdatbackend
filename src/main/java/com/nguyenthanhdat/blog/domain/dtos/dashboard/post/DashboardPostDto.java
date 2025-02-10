@@ -20,7 +20,7 @@ public class DashboardPostDto {
     private String title;
     private String content;
     private PostStatus status;
-    private Integer readingTime;
+    private Integer reading_time;
     private String slug;
     private DashboardCategoryDto category;
     private Set<DashboardTagDto> tags;

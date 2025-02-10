@@ -48,7 +48,6 @@ public class TagServiceImpl implements TagService {
                 .map(dashboardTagMapper::toTagListDto)
                 .toList();
 
-        long totalRecords = tagRepository.count(specification);
         int totalPages = tagPage.getTotalPages();
 
         DashboardTagListPagingDto dashboardTagListPagingDto = DashboardTagListPagingDto.builder()

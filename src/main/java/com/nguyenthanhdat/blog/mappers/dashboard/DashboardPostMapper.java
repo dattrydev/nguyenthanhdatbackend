@@ -2,7 +2,6 @@ package com.nguyenthanhdat.blog.mappers.dashboard;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostListDto;
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardUpdatePostDto;
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
 import org.mapstruct.Mapper;
@@ -22,6 +21,7 @@ public interface DashboardPostMapper {
                 .id(post.getId())
                 .title(post.getTitle())
                 .status(post.getStatus())
+                .reading_time(post.getReadingTime())
                 .slug(post.getSlug())
                 .category_name(post.getCategory().getName())
                 .tags_name(post.getTags().stream()

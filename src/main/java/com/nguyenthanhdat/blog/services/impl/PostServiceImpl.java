@@ -39,7 +39,10 @@ public class PostServiceImpl implements PostService {
     private final PresignedUrl presignedUrl;
 
     @Override
-    public Optional<DashboardPostListPagingDto> getDashboardPostList(String title, String status, Integer readingTime, String category, int page, int size, String sortBy, String sortDirection) {
+    public Optional<DashboardPostListPagingDto> getDashboardPostList(
+            String title, List<String> status, Integer reading_time, List<String> category, List<String> tags,
+            int page, int size, String sortBy, String sortDirection) {
+
         if (page < 0) {
             throw new IllegalArgumentException("Page number must be greater than 0");
         }
@@ -47,10 +50,15 @@ public class PostServiceImpl implements PostService {
         Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        Specification<Post> specification = Specification.where(PostSpecification.hasStatus(status != null ? PostStatus.valueOf(status) : null))
+        List<PostStatus> statusList = status.stream()
+                .map(PostStatus::valueOf)
+                .collect(Collectors.toList());
+
+        Specification<Post> specification = Specification.where(PostSpecification.hasStatus(statusList))
                 .and(PostSpecification.hasTitle(title))
-                .and(PostSpecification.hasReadingTime(readingTime))
-                .and(PostSpecification.hasCategory(category));
+                .and(PostSpecification.hasReadingTime(reading_time))
+                .and(PostSpecification.hasCategory(category))
+                .and(PostSpecification.hasTags(tags));
 
         Page<Post> postPage = postRepository.findAll(specification, pageable);
 
@@ -58,7 +66,6 @@ public class PostServiceImpl implements PostService {
                 .map(dashboardPostMapper::toPostListDto)
                 .collect(Collectors.toList());
 
-        long totalRecords = postRepository.count(specification);
         int totalPages = postPage.getTotalPages();
 
         DashboardPostListPagingDto dashboardPostListPagingDto = DashboardPostListPagingDto.builder()
@@ -69,6 +76,7 @@ public class PostServiceImpl implements PostService {
 
         return Optional.of(dashboardPostListPagingDto);
     }
+
 
     @Override
     public Optional<DashboardPostDto> getPostBySlug(String slug) {
@@ -178,6 +186,15 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
         postRepository.delete(post);
+    }
+
+    @Override
+    public void deletePosts(List<UUID> ids) {
+        for (UUID id : ids) {
+            Post post = postRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
+            postRepository.delete(post);
+        }
     }
 
 

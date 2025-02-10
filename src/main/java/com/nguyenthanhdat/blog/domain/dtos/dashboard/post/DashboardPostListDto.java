@@ -13,6 +13,7 @@ public class DashboardPostListDto {
     private UUID id;
     private String title;
     private PostStatus status;
+    private Integer reading_time;
     private String slug;
     private String category_name;
     private String tags_name;

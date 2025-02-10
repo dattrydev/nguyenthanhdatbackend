@@ -12,8 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/dashboard/v1/posts")
@@ -25,19 +24,28 @@ public class PostController {
     public ResponseEntity<DashboardPostListPagingDto> getDashboardPostList(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) Integer readingTime,
+            @RequestParam(required = false) Integer reading_time,
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String tags,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {
         page = page - 1;
-        Optional<DashboardPostListPagingDto> response = postService.getDashboardPostList(title, status, readingTime, category, page, size, sortBy, sortDirection);
+
+        List<String> statusList = (status != null && !status.isEmpty()) ? Arrays.asList(status.split(",")) : Collections.emptyList();
+        List<String> categoryList = (category != null && !category.isEmpty()) ? Arrays.asList(category.split(",")) : Collections.emptyList();
+        List<String> tagsList = (tags != null && !tags.isEmpty()) ? Arrays.asList(tags.split(",")) : Collections.emptyList();
+
+        Optional<DashboardPostListPagingDto> response = postService.getDashboardPostList(
+                title, statusList, reading_time, categoryList, tagsList, page, size, sortBy, sortDirection
+        );
 
         return response.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("No post found"));
     }
+
 
     @GetMapping("/{slug}")
     public ResponseEntity<DashboardPostDto> getDashboardPostBySlug(@PathVariable String slug) {
@@ -79,4 +87,9 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping
+    public ResponseEntity<Void> deleteMultiplePosts(@RequestBody List<UUID> ids) {
+        postService.deletePosts(ids);
+        return ResponseEntity.noContent().build();
+    }
 }
