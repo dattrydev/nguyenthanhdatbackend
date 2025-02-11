@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.nguyenthanhdat.blog.utils.SlugGenerator.generateSlug;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -47,7 +49,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(dashboardCategoryMapper::toCategoryListDto)
                 .toList();
 
-        long totalRecords = categoryRepository.count(specification);
         int totalPages = categoryPage.getTotalPages();
 
         DashboardCategoryListPagingDto dashboardCategoryListPagingDto = DashboardCategoryListPagingDto.builder()
@@ -60,13 +61,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Optional<DashboardCategoryDto> getDashboardCategoryById(UUID id) {
-        Optional<Category> category = categoryRepository.findById(id);
-        if(category.isPresent()){
-            return Optional.of(dashboardCategoryMapper.toDto(category.get()));
-        } else {
-            throw new ResourceNotFoundException("Category with id " + id + " not found");
-        }
+    public Optional<DashboardCategoryDto> getDashboardCategoryBySlug(String slug) {
+        Optional<Category> category = categoryRepository.findBySlug(slug);
+
+        return Optional.of(dashboardCategoryMapper.toDto(category.orElseThrow(() -> new ResourceNotFoundException("Category with slug " + slug + " not found"))));
     }
 
     @Override
@@ -75,10 +73,21 @@ public class CategoryServiceImpl implements CategoryService {
         if(categoryRepository.existsByNameIgnoreCase(dashboardCreateCategoryDto.getName())){
             throw new ResourceAlreadyExistsException("Category with name " + dashboardCreateCategoryDto.getName() + " already exists");
         } else {
-            Category categoryToCreate = dashboardCategoryMapper.toEntity(dashboardCreateCategoryDto);
+            String generatedSlug = generateSlug(dashboardCreateCategoryDto.getName());
+
+            Category categoryToCreate = Category.builder()
+                    .name(dashboardCreateCategoryDto.getName())
+                    .slug(generatedSlug)
+                    .build();
+
             categoryRepository.save(categoryToCreate);
 
-            return Optional.of(dashboardCategoryMapper.toDto(categoryToCreate));
+            UUID id = categoryToCreate.getId();
+
+            return Optional.of(dashboardCategoryMapper.toDto(categoryToCreate)).map(category -> {
+                category.setId(id);
+                return category;
+            });
         }
     }
 
@@ -90,6 +99,7 @@ public class CategoryServiceImpl implements CategoryService {
         if(existingCategory.isPresent()){
             Category updatedCategory = existingCategory.get();
             updatedCategory.setName(dashboardUpdateCategoryDto.getName());
+            updatedCategory.setSlug(generateSlug(dashboardUpdateCategoryDto.getName()));
             categoryRepository.save(updatedCategory);
 
             return Optional.of(dashboardCategoryMapper.toDto(updatedCategory));

@@ -33,12 +33,11 @@ public class CategoryController {
                 .orElseThrow(() -> new ResourceNotFoundException("No categories found"));
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<DashboardCategoryDto> getDashboardCategoryById(@PathVariable UUID id) {
-        Optional<DashboardCategoryDto> dashboardCategoryDto = categoryService.getDashboardCategoryById(id);
-
-        return dashboardCategoryDto.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+    @GetMapping("/{slug}")
+    public ResponseEntity<DashboardCategoryDto> getDashboardCategoryBySlug(@PathVariable String slug) {
+        return categoryService.getDashboardCategoryBySlug(slug)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("Category " + slug + " not found"));
     }
 
     @GetMapping("/check-unique")

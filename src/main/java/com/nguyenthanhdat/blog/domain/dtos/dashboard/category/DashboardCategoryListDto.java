@@ -14,4 +14,5 @@ import java.util.UUID;
 public class DashboardCategoryListDto {
     private UUID id;
     private String name;
+    private String slug;
 }

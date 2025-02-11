@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface CategoryService {
     Optional<DashboardCategoryListPagingDto> getDashboardCategoryList(String name, int page, int size, String sortBy, String sortDirection);
-    Optional<DashboardCategoryDto> getDashboardCategoryById(UUID id);
+    Optional<DashboardCategoryDto> getDashboardCategoryBySlug(String slug);
     Optional<DashboardCategoryDto> createCategory(DashboardCreateCategoryDto dashboardCreateCategoryDto);
     Optional<DashboardCategoryDto> updateCategory(UUID id, DashboardUpdateCategoryDto category);
     void deleteCategory(UUID id);

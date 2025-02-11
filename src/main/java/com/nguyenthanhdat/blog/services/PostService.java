@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface PostService {
-        Optional<DashboardPostListPagingDto> getDashboardPostList(String title, List<String> status, Integer reading_time, List<String> category, List<String> tags, int page, int size, String sortBy, String sortDirection);
+    Optional<DashboardPostListPagingDto> getDashboardPostList(String title, List<String> status, Integer reading_time, List<String> category, List<String> tags, int page, int size, String sortBy, String sortDirection);
 
     Optional<DashboardPostDto> getPostBySlug(String slug);
 

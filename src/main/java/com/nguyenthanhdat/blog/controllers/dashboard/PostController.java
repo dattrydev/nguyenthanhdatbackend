@@ -46,7 +46,6 @@ public class PostController {
                 .orElseThrow(() -> new ResourceNotFoundException("No post found"));
     }
 
-
     @GetMapping("/{slug}")
     public ResponseEntity<DashboardPostDto> getDashboardPostBySlug(@PathVariable String slug) {
         return postService.getPostBySlug(slug)

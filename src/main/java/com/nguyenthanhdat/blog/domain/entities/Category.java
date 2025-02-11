@@ -26,6 +26,11 @@ public class Category {
     @Size(min = 3, max = 100, message = "Category name must be between 3 and 100 characters")
     private String name;
 
+    @Column(nullable = false, unique = true)
+    @NotNull(message = "Category slug cannot be null")
+    @Size(min = 3, max = 100, message = "Category slug must be between 3 and 100 characters")
+    private String slug;
+
     @OneToMany(mappedBy = "category")
     private List<Post> posts;
 

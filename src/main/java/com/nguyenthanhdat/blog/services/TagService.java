@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface TagService {
     Optional<DashboardTagListPagingDto> getDashboardTagList(String name, int page, int size, String sortBy, String sortDirection);
-    Optional<DashboardTagDto> getDashboardTagById(UUID id);
+    Optional<DashboardTagDto> getDashboardTagBySlug(String slug);
     Optional<DashboardTagDto> createTag(DashboardCreateTagDto createTagDto);
     Optional<DashboardTagDto> updateTag(UUID id, DashboardUpdateTagDto tag);
     void deleteTag(UUID id);

@@ -139,15 +139,19 @@ public class PostServiceImpl implements PostService {
 
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post " + id + " not found"));
-        System.out.println("dashboardUpdatePostDto: " + dashboardUpdatePostDto);
 
         String convertedContent = presignedUrl.convertPresignedUrlToKey(dashboardUpdatePostDto.getContent());
-
-        System.out.println("convertedContent: " + convertedContent);
 
         if (dashboardUpdatePostDto.getTitle() != null) {
             post.setTitle(dashboardUpdatePostDto.getTitle());
         }
+
+        String generatedSlug = generateSlug(post.getTitle());
+        if (postRepository.existsBySlug(generatedSlug)) {
+            throw new ResourceAlreadyExistsException("Post with slug '" + generatedSlug + "' already exists.");
+        }
+        post.setSlug(generatedSlug);
+
         if (dashboardUpdatePostDto.getContent() != null) {
             post.setContent(convertedContent);
             post.setReadingTime(ReadingTime.calculateReadingTime(dashboardUpdatePostDto.getContent()));

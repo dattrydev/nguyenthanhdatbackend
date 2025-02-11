@@ -1,7 +1,5 @@
 package com.nguyenthanhdat.blog.domain.entities;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -27,6 +25,11 @@ public class Tag {
     @NotNull(message = "Tag name cannot be null")
     @Size(min = 2, max = 100, message = "Tag name must be between 2 and 100 characters")
     private String name;
+
+    @Column(nullable = false, unique = true)
+    @NotNull(message = "Tag slug cannot be null")
+    @Size(min = 3, max = 100, message = "Tag slug must be between 3 and 100 characters")
+    private String slug;
 
     @ManyToMany(mappedBy = "tags")
     private Set<Post> posts;

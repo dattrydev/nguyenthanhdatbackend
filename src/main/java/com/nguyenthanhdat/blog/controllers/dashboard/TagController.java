@@ -7,7 +7,6 @@ import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardUpdateTagDto;
 import com.nguyenthanhdat.blog.exceptions.ResourceCreationException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
 import com.nguyenthanhdat.blog.exceptions.ResourceUpdateException;
-import com.nguyenthanhdat.blog.mappers.dashboard.DashboardTagMapper;
 import com.nguyenthanhdat.blog.services.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +38,11 @@ public class TagController {
                 .orElseThrow(() -> new ResourceNotFoundException("No tags found"));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DashboardTagDto> getDashboardTagById(@PathVariable UUID id){
-        Optional<DashboardTagDto> tag = tagService.getDashboardTagById(id);
-        return tag.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("Tag " + id + " not found"));
+    @GetMapping("/{slug}")
+    public ResponseEntity<DashboardTagDto> getDashboardTagBySlug(@PathVariable String slug) {
+        return tagService.getDashboardTagBySlug(slug)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("Tag " + slug + " not found"));
     }
 
     @GetMapping("/check-unique")

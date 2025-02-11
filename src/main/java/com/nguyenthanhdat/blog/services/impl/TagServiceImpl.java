@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.nguyenthanhdat.blog.utils.SlugGenerator.generateSlug;
+
 @Service
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
@@ -59,11 +61,11 @@ public class TagServiceImpl implements TagService {
         return Optional.of(dashboardTagListPagingDto);
     }
 
-
     @Override
-    public Optional<DashboardTagDto> getDashboardTagById(UUID id) {
-        Optional<Tag> tag = tagRepository.findById(id);
-        return tag.map(dashboardTagMapper::toDto);
+    public Optional<DashboardTagDto> getDashboardTagBySlug(String slug) {
+        Optional<DashboardTagDto> tag = tagRepository.findBySlug(slug);
+
+        return Optional.of(tag.orElseThrow(() -> new ResourceNotFoundException("Tag " + slug + " not found")));
     }
 
     @Override
@@ -72,9 +74,19 @@ public class TagServiceImpl implements TagService {
         if(tagRepository.existsByNameIgnoreCase(dashboardCreateTagDto.getName())) {
             throw new ResourceAlreadyExistsException("Tag with name " + dashboardCreateTagDto.getName() + " already exists");
         } else {
-            Tag tagToCreate = dashboardTagMapper.toEntity(dashboardCreateTagDto);
+            String generatedSlug = generateSlug(dashboardCreateTagDto.getName());
+            Tag tagToCreate = Tag.builder()
+                    .name(dashboardCreateTagDto.getName())
+                    .slug(generatedSlug)
+                    .build();
             tagRepository.save(tagToCreate);
-            return Optional.of(dashboardTagMapper.toDto(tagToCreate));
+
+            UUID id = tagToCreate.getId();
+
+            return Optional.of(dashboardTagMapper.toDto(tagToCreate)).map(tag -> {
+                tag.setId(id);
+                return tag;
+            });
         }
     }
 
@@ -88,6 +100,7 @@ public class TagServiceImpl implements TagService {
             throw new ResourceAlreadyExistsException("Tag with name " + dashboardUpdateTagDto.getName() + " already exists");
         } else {
             tag.setName(dashboardUpdateTagDto.getName());
+            tag.setSlug(generateSlug(dashboardUpdateTagDto.getName()));
             tagRepository.save(tag);
             return Optional.of(dashboardTagMapper.toDto(tag));
         }
