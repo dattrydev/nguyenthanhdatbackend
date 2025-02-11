@@ -63,9 +63,9 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Optional<DashboardTagDto> getDashboardTagBySlug(String slug) {
-        Optional<DashboardTagDto> tag = tagRepository.findBySlug(slug);
+        Optional<Tag> tag = tagRepository.findBySlug(slug);
 
-        return Optional.of(tag.orElseThrow(() -> new ResourceNotFoundException("Tag " + slug + " not found")));
+        return Optional.of(dashboardTagMapper.toDto(tag.orElseThrow(() -> new ResourceNotFoundException("Tag with slug " + slug + " not found"))));
     }
 
     @Override
@@ -107,6 +107,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional
     public void deleteTag(UUID id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new ResourceDeleteException("Tag with id " + id + " not found"));
@@ -123,11 +124,21 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional
     public void deleteTags(List<UUID> ids) {
         for (UUID id : ids) {
             Tag tag = tagRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Tag " + id + " not found"));
-            tagRepository.delete(tag);
+
+            try {
+                tagRepository.delete(tag);
+            } catch (DataIntegrityViolationException e) {
+                throw new ResourceDeleteException("Cannot delete tag with id " + id + " because it is referenced in another entity.");
+            } catch (EmptyResultDataAccessException e) {
+                throw new ResourceDeleteException("Cannot delete tag with id " + id + " because it does not exist.");
+            } catch (Exception e) {
+                throw new ResourceDeleteException("Failed to delete tag: " + id + ". Error: " + e.getMessage());
+            }
         }
     }
 

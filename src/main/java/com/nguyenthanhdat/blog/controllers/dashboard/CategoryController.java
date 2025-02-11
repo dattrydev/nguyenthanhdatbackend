@@ -74,7 +74,7 @@ public class CategoryController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteMultipleCategories(@RequestParam List<UUID> ids) {
+    public ResponseEntity<Void> deleteMultipleCategories(@RequestBody List<UUID> ids) {
         categoryService.deleteCategories(ids);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

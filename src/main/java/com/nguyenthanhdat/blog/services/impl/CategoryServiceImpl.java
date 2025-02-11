@@ -112,6 +112,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategory(UUID id) {
         categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id " + id + " not found"));
@@ -126,11 +127,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategories(List<UUID> ids) {
         for (UUID id : ids) {
             Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Category " + id + " not found"));
-            categoryRepository.delete(category);
+
+            try {
+                categoryRepository.delete(category);
+            } catch (DataIntegrityViolationException e) {
+                throw new ResourceDeleteException("Cannot delete category with id " + id + " because it is referenced in another entity.");
+            } catch (Exception e) {
+                throw new ResourceDeleteException("Failed to delete category: " + id + ". Error: " + e.getMessage());
+            }
         }
     }
 

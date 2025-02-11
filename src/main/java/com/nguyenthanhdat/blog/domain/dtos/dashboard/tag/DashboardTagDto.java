@@ -14,5 +14,6 @@ import java.util.UUID;
 public class DashboardTagDto {
     private UUID id;
     private String name;
+    private String slug;
 }
 

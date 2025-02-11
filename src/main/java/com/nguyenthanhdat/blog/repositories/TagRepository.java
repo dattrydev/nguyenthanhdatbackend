@@ -16,5 +16,5 @@ public interface TagRepository extends JpaRepository<Tag, UUID>, JpaSpecificatio
     boolean existsByName(String name);
     boolean existsByNameIgnoreCase(String name);
 
-    Optional<DashboardTagDto> findBySlug(@NotNull(message = "Tag slug cannot be null") @Size(min = 3, max = 100, message = "Tag slug must be between 3 and 100 characters") String slug);
+    Optional<Tag> findBySlug(@NotNull(message = "Tag slug cannot be null") @Size(min = 3, max = 100, message = "Tag slug must be between 3 and 100 characters") String slug);
 }

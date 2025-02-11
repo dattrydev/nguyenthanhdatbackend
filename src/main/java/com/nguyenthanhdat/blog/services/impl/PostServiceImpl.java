@@ -193,6 +193,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void deletePosts(List<UUID> ids) {
         for (UUID id : ids) {
             Post post = postRepository.findById(id)

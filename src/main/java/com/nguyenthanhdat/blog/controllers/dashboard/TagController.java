@@ -75,7 +75,7 @@ public class TagController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteMultipleTags(@RequestParam List<UUID> ids){
+    public ResponseEntity<Void> deleteMultipleTags(@RequestBody List<UUID> ids){
         tagService.deleteTags(ids);
         return ResponseEntity.noContent().build();
     }
