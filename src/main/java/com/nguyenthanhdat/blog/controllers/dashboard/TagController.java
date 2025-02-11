@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -70,6 +71,12 @@ public class TagController {
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Void> deleteTag(@PathVariable UUID id) {
         tagService.deleteTag(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteMultipleTags(@RequestParam List<UUID> ids){
+        tagService.deleteTags(ids);
         return ResponseEntity.noContent().build();
     }
 }

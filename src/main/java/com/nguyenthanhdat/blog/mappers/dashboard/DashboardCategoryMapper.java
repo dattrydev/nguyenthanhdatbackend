@@ -5,7 +5,6 @@ import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.DashboardCategoryL
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.DashboardCreateCategoryDto;
 import com.nguyenthanhdat.blog.domain.entities.Category;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface DashboardCategoryMapper {

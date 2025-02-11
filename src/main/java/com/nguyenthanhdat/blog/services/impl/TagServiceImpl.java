@@ -123,6 +123,15 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public void deleteTags(List<UUID> ids) {
+        for (UUID id : ids) {
+            Tag tag = tagRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Tag " + id + " not found"));
+            tagRepository.delete(tag);
+        }
+    }
+
+    @Override
     public boolean isFieldExists(String field, String value) {
         return switch (field) {
             case "name" -> tagRepository.existsByName(value);

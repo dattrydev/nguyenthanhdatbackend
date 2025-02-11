@@ -45,6 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Page<Category> categoryPage = categoryRepository.findAll(specification, pageable);
 
+
         List<DashboardCategoryListDto> categoryListDtos = categoryPage.stream()
                 .map(dashboardCategoryMapper::toCategoryListDto)
                 .toList();
@@ -56,6 +57,8 @@ public class CategoryServiceImpl implements CategoryService {
                 .totalPages(totalPages)
                 .currentPage(page + 1)
                 .build();
+
+        System.out.println("DashboardCategoryListPagingDto: " + dashboardCategoryListPagingDto);
 
         return Optional.of(dashboardCategoryListPagingDto);
     }
@@ -119,6 +122,15 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ResourceDeleteException("Cannot delete category with id " + id + " because it is referenced in another entity.");
         } catch (Exception e) {
             throw new ResourceDeleteException("Failed to delete category: " + id + ". Error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteCategories(List<UUID> ids) {
+        for (UUID id : ids) {
+            Category category = categoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category " + id + " not found"));
+            categoryRepository.delete(category);
         }
     }
 

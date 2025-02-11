@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,6 +70,12 @@ public class CategoryController {
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
         categoryService.deleteCategory(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteMultipleCategories(@RequestParam List<UUID> ids) {
+        categoryService.deleteCategories(ids);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
