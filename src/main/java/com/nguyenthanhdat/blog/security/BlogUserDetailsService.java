@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.security;
 
 import com.nguyenthanhdat.blog.domain.entities.User;
-import com.nguyenthanhdat.blog.repositories.UserRepository;
+import com.nguyenthanhdat.blog.domain.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.services.impl;
 
 import com.nguyenthanhdat.blog.domain.entities.User;
-import com.nguyenthanhdat.blog.repositories.UserRepository;
+import com.nguyenthanhdat.blog.domain.repositories.UserRepository;
 import com.nguyenthanhdat.blog.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

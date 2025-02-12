@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.config;
 
 import com.nguyenthanhdat.blog.domain.entities.User;
-import com.nguyenthanhdat.blog.repositories.UserRepository;
+import com.nguyenthanhdat.blog.domain.repositories.UserRepository;
 import com.nguyenthanhdat.blog.security.BlogUserDetailsService;
 import com.nguyenthanhdat.blog.security.JwtAuthenticationFilter;
 import com.nguyenthanhdat.blog.services.AuthenticationService;

@@ -1,12 +1,16 @@
 package com.nguyenthanhdat.blog.services.impl;
 
+import com.nguyenthanhdat.blog.domain.dtos.blog.category.BlogCategoryDto;
+import com.nguyenthanhdat.blog.domain.dtos.blog.category.BlogCategoryListDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.*;
 import com.nguyenthanhdat.blog.domain.entities.Category;
+import com.nguyenthanhdat.blog.domain.projections.blog.category.BlogCategoryProjection;
 import com.nguyenthanhdat.blog.exceptions.ResourceAlreadyExistsException;
 import com.nguyenthanhdat.blog.exceptions.ResourceDeleteException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
+import com.nguyenthanhdat.blog.mappers.blog.BlogCategoryMapper;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardCategoryMapper;
-import com.nguyenthanhdat.blog.repositories.CategoryRepository;
+import com.nguyenthanhdat.blog.domain.repositories.CategoryRepository;
 import com.nguyenthanhdat.blog.services.CategoryService;
 import com.nguyenthanhdat.blog.specification.CategorySpecification;
 import jakarta.transaction.Transactional;
@@ -31,6 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final DashboardCategoryMapper dashboardCategoryMapper;
+    private final BlogCategoryMapper blogCategoryMapper;
 
     @Override
     public Optional<DashboardCategoryListPagingDto> getDashboardCategoryList(String name, int page, int size, String sortBy, String sortDirection) {
@@ -57,8 +62,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .totalPages(totalPages)
                 .currentPage(page + 1)
                 .build();
-
-        System.out.println("DashboardCategoryListPagingDto: " + dashboardCategoryListPagingDto);
 
         return Optional.of(dashboardCategoryListPagingDto);
     }
@@ -153,6 +156,21 @@ public class CategoryServiceImpl implements CategoryService {
             case "name" -> categoryRepository.existsByName(value);
             default -> false;
         };
+    }
+
+    @Override
+    public Optional<BlogCategoryListDto> getBlogCategoryList() {
+        List<BlogCategoryProjection> categories = categoryRepository.findAllCategoriesWithPostCount();
+
+        List<BlogCategoryDto> blogCategoryListDtos = categories.stream()
+                .map(blogCategoryMapper::toBlogCategoryDto)
+                .toList();
+
+        BlogCategoryListDto blogCategoryListDto = BlogCategoryListDto.builder()
+                .categories(blogCategoryListDtos)
+                .build();
+
+        return Optional.of(blogCategoryListDto);
     }
 
 }

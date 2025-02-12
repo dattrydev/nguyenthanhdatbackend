@@ -1,4 +1,4 @@
-package com.nguyenthanhdat.blog.domain.dtos.blog;
+package com.nguyenthanhdat.blog.domain.dtos.blog.category;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryDto {
+public class BlogCategoryDto {
     private String name;
     private String slug;
-
+    private Integer post_count;
 }

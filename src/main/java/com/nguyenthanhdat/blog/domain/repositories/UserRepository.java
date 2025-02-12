@@ -1,4 +1,4 @@
-package com.nguyenthanhdat.blog.repositories;
+package com.nguyenthanhdat.blog.domain.repositories;
 
 import com.nguyenthanhdat.blog.domain.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;

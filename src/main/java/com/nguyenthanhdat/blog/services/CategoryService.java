@@ -1,5 +1,6 @@
 package com.nguyenthanhdat.blog.services;
 
+import com.nguyenthanhdat.blog.domain.dtos.blog.category.BlogCategoryListDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.category.*;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface CategoryService {
     void deleteCategory(UUID id);
     void deleteCategories(List<UUID> ids);
     boolean isFieldExists(String field, String value);
+
+    Optional<BlogCategoryListDto> getBlogCategoryList();
 }

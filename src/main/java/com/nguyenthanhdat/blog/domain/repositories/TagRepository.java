@@ -1,6 +1,5 @@
-package com.nguyenthanhdat.blog.repositories;
+package com.nguyenthanhdat.blog.domain.repositories;
 
-import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.DashboardTagDto;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

@@ -1,4 +1,4 @@
-package com.nguyenthanhdat.blog.repositories;
+package com.nguyenthanhdat.blog.domain.repositories;
 
 import com.nguyenthanhdat.blog.domain.entities.Post;
 import org.springframework.data.domain.Page;

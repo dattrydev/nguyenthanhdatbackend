@@ -6,7 +6,7 @@ import com.nguyenthanhdat.blog.exceptions.ResourceAlreadyExistsException;
 import com.nguyenthanhdat.blog.exceptions.ResourceDeleteException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardTagMapper;
-import com.nguyenthanhdat.blog.repositories.TagRepository;
+import com.nguyenthanhdat.blog.domain.repositories.TagRepository;
 import com.nguyenthanhdat.blog.services.TagService;
 import com.nguyenthanhdat.blog.specification.TagSpecification;
 import jakarta.transaction.Transactional;
