@@ -1,5 +1,7 @@
 package com.nguyenthanhdat.blog.services.impl;
 
+import com.nguyenthanhdat.blog.domain.dtos.blog.post.BlogPostListDto;
+import com.nguyenthanhdat.blog.domain.dtos.blog.post.BlogPostListPagingDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.*;
 import com.nguyenthanhdat.blog.domain.enums.PostStatus;
 import com.nguyenthanhdat.blog.domain.entities.Category;
@@ -7,6 +9,7 @@ import com.nguyenthanhdat.blog.domain.entities.Post;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
 import com.nguyenthanhdat.blog.exceptions.ResourceAlreadyExistsException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
+import com.nguyenthanhdat.blog.mappers.blog.BlogPostMapper;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardPostMapper;
 import com.nguyenthanhdat.blog.domain.repositories.CategoryRepository;
 import com.nguyenthanhdat.blog.domain.repositories.PostRepository;
@@ -34,15 +37,16 @@ import static com.nguyenthanhdat.blog.utils.SlugGenerator.generateSlug;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final DashboardPostMapper dashboardPostMapper;
+    private final BlogPostMapper blogPostMapper;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final PresignedUrl presignedUrl;
 
     @Override
     public Optional<DashboardPostListPagingDto> getDashboardPostList(
-            String title, List<String> status, Integer reading_time, List<String> category, List<String> tags,
+            String title, List<String> status, Integer readingTime, List<String> category, List<String> tags,
             int page, int size, String sortBy, String sortDirection) {
-
+        page = page - 1;
         if (page < 0) {
             throw new IllegalArgumentException("Page number must be greater than 0");
         }
@@ -56,7 +60,7 @@ public class PostServiceImpl implements PostService {
 
         Specification<Post> specification = Specification.where(PostSpecification.hasStatus(statusList))
                 .and(PostSpecification.hasTitle(title))
-                .and(PostSpecification.hasReadingTime(reading_time))
+                .and(PostSpecification.hasReadingTime(readingTime))
                 .and(PostSpecification.hasCategory(category))
                 .and(PostSpecification.hasTags(tags));
 
@@ -166,14 +170,14 @@ public class PostServiceImpl implements PostService {
             post.setStatus(dashboardUpdatePostDto.getStatus());
         }
 
-        if (dashboardUpdatePostDto.getCategory_id() != null) {
-            Category category = categoryRepository.findById(dashboardUpdatePostDto.getCategory_id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Category " + dashboardUpdatePostDto.getCategory_id() + " not found"));
+        if (dashboardUpdatePostDto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dashboardUpdatePostDto.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category " + dashboardUpdatePostDto.getCategoryId() + " not found"));
             post.setCategory(category);
         }
 
-        if (dashboardUpdatePostDto.getTags_id() != null && !dashboardUpdatePostDto.getTags_id().isEmpty()) {
-            Set<Tag> tags = dashboardUpdatePostDto.getTags_id().stream()
+        if (dashboardUpdatePostDto.getTagsId() != null && !dashboardUpdatePostDto.getTagsId().isEmpty()) {
+            Set<Tag> tags = dashboardUpdatePostDto.getTagsId().stream()
                     .map(tag_id -> tagRepository.findById(tag_id)
                             .orElseThrow(() -> new ResourceNotFoundException("Tag " + tag_id + " not found")))
                     .collect(Collectors.toSet());
@@ -217,6 +221,38 @@ public class PostServiceImpl implements PostService {
             default:
                 throw new IllegalArgumentException("Invalid field: " + field);
         }
+    }
+
+    @Override
+    public Optional<BlogPostListPagingDto> getBlogPostList(String title, String description, String categoryName, String tagsName, int page, int size, String sortBy, String sortDirection) {
+        page = page - 1;
+        if (page < 0) {
+            throw new IllegalArgumentException("Page number must be greater than 0");
+        }
+
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Specification<Post> specification = Specification.where(PostSpecification.hasTitle(title))
+                .and(PostSpecification.hasDescription(description))
+                .and(PostSpecification.hasCategoryName(categoryName))
+                .and(PostSpecification.hasTagsName(tagsName));
+
+        Page<Post> postPage = postRepository.findAll(specification, pageable);
+
+        List<BlogPostListDto> postDtos = postPage.stream()
+                .map(blogPostMapper::toBlogPostListDto)
+                .collect(Collectors.toList());
+
+        int totalPages = postPage.getTotalPages();
+
+        BlogPostListPagingDto blogPostListPagingDto = BlogPostListPagingDto.builder()
+                .posts(postDtos)
+                .totalPages(totalPages)
+                .currentPage(page + 1)
+                .build();
+
+        return Optional.of(blogPostListPagingDto);
     }
 
 

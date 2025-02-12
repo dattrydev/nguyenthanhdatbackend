@@ -38,7 +38,7 @@ public class User {
     private String name;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "create_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Override

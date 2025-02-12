@@ -28,6 +28,15 @@ public class PostSpecification {
         };
     }
 
+    public static Specification<Post> hasDescription(String description) {
+        return (root, query, criteriaBuilder) -> {
+            if (StringUtils.hasText(description)) {
+                return criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + description.toLowerCase() + "%");
+            }
+            return null;
+        };
+    }
+
     public static Specification<Post> hasCategory(List<String> category) {
         return (root, query, criteriaBuilder) -> {
             if (category != null && !category.isEmpty()) {
@@ -41,6 +50,14 @@ public class PostSpecification {
         };
     }
 
+    public static Specification<Post> hasCategoryName(String categoryName) {
+        return (root, query, criteriaBuilder) -> {
+            if (StringUtils.hasText(categoryName)) {
+                return criteriaBuilder.like(criteriaBuilder.lower(root.get("category").get("name")), "%" + categoryName.toLowerCase() + "%");
+            }
+            return null;
+        };
+    }
 
     public static Specification<Post> hasTags(List<String> tags) {
         return (root, query, criteriaBuilder) -> {
@@ -50,6 +67,15 @@ public class PostSpecification {
                         .collect(Collectors.toList());
 
                 return root.join("tags").get("id").in(tagIds);
+            }
+            return null;
+        };
+    }
+
+    public static Specification<Post> hasTagsName(String tagsName) {
+        return (root, query, criteriaBuilder) -> {
+            if (StringUtils.hasText(tagsName)) {
+                return criteriaBuilder.like(criteriaBuilder.lower(root.get("tags").get("name")), "%" + tagsName.toLowerCase() + "%");
             }
             return null;
         };

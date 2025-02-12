@@ -24,7 +24,7 @@ public class PostController {
     public ResponseEntity<DashboardPostListPagingDto> getDashboardPostList(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) Integer reading_time,
+            @RequestParam(required = false) Integer readingTime,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String tags,
             @RequestParam(defaultValue = "1") int page,
@@ -32,14 +32,12 @@ public class PostController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {
-        page = page - 1;
-
         List<String> statusList = (status != null && !status.isEmpty()) ? Arrays.asList(status.split(",")) : Collections.emptyList();
         List<String> categoryList = (category != null && !category.isEmpty()) ? Arrays.asList(category.split(",")) : Collections.emptyList();
         List<String> tagsList = (tags != null && !tags.isEmpty()) ? Arrays.asList(tags.split(",")) : Collections.emptyList();
 
         Optional<DashboardPostListPagingDto> response = postService.getDashboardPostList(
-                title, statusList, reading_time, categoryList, tagsList, page, size, sortBy, sortDirection
+                title, statusList, readingTime, categoryList, tagsList, page, size, sortBy, sortDirection
         );
 
         return response.map(ResponseEntity::ok)

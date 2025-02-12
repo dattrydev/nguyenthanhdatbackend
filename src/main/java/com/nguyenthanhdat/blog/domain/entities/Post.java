@@ -45,7 +45,7 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
-    @Column(nullable = false)
+    @Column(name = "reading_time", nullable = false)
     @NotNull(message = "Reading time cannot be null")
     private Integer readingTime;
 
@@ -67,23 +67,23 @@ public class Post {
     private Set<Tag> tags;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "create_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false)
+    @Column(name = "update_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Post post = (Post) o;
-        return Objects.equals(id, post.id) && Objects.equals(title, post.title) && Objects.equals(content, post.content) && status == post.status && Objects.equals(readingTime, post.readingTime) && Objects.equals(createdAt, post.createdAt) && Objects.equals(updatedAt, post.updatedAt);
+        return Objects.equals(id, post.id) && Objects.equals(title, post.title) && Objects.equals(description, post.description) && Objects.equals(content, post.content) && status == post.status && Objects.equals(readingTime, post.readingTime) && Objects.equals(slug, post.slug) && Objects.equals(category, post.category) && Objects.equals(tags, post.tags) && Objects.equals(createdAt, post.createdAt) && Objects.equals(updatedAt, post.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, content, status, readingTime, createdAt, updatedAt);
+        return Objects.hash(id, title, description, content, status, readingTime, slug, category, tags, createdAt, updatedAt);
     }
 
     @PrePersist
