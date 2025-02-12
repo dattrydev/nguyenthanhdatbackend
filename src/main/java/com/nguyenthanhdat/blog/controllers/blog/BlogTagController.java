@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,8 +19,8 @@ public class BlogTagController {
     private final TagService tagService;
 
     @GetMapping
-    public ResponseEntity<BlogTagListDto> getBlogTagList() {
-        Optional<BlogTagListDto> blogTagListDto = tagService.getBlogTagList();
+    public ResponseEntity<List<BlogTagListDto>> getBlogTagList() {
+        Optional<List<BlogTagListDto>> blogTagListDto = tagService.getBlogTagList();
 
         return blogTagListDto.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("No tags found"));

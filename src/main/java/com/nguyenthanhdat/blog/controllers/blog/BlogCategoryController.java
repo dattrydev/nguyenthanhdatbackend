@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,8 +19,8 @@ public class BlogCategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<BlogCategoryListDto> getBlogCategoryList() {
-        Optional<BlogCategoryListDto> blogCategoryListDto = categoryService.getBlogCategoryList();
+    public ResponseEntity<List<BlogCategoryListDto>> getBlogCategoryList() {
+        Optional<List<BlogCategoryListDto>> blogCategoryListDto = categoryService.getBlogCategoryList();
 
         return blogCategoryListDto.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("No categories found"));

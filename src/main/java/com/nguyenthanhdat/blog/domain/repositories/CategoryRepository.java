@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.domain.repositories;
 
 import com.nguyenthanhdat.blog.domain.entities.Category;
-import com.nguyenthanhdat.blog.domain.projections.blog.category.BlogCategoryProjection;
+import com.nguyenthanhdat.blog.domain.projections.blog.category.BlogCategoryListProjection;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,5 +26,5 @@ public interface CategoryRepository extends JpaRepository<Category, UUID>, JpaSp
     LEFT JOIN posts p ON c.id = p.category_id
     GROUP BY c.id, c.name, c.slug
 """, nativeQuery = true)
-    List<BlogCategoryProjection> findAllCategoriesWithPostCount();
+    List<BlogCategoryListProjection> findAllCategoriesWithPostCount();
 }

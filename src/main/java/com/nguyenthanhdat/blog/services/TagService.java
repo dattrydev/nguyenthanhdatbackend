@@ -16,5 +16,5 @@ public interface TagService {
     void deleteTags(List<UUID> ids);
     boolean isFieldExists(String field, String value);
 
-    Optional<BlogTagListDto> getBlogTagList();
+    Optional<List<BlogTagListDto>> getBlogTagList();
 }

@@ -12,5 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class BlogCategoryListDto {
-    private List<BlogCategoryDto> categories;
+    private String name;
+    private String slug;
+    private Integer postCount;
 }

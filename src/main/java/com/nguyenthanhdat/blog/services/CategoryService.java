@@ -16,5 +16,5 @@ public interface CategoryService {
     void deleteCategories(List<UUID> ids);
     boolean isFieldExists(String field, String value);
 
-    Optional<BlogCategoryListDto> getBlogCategoryList();
+    Optional<List<BlogCategoryListDto>> getBlogCategoryList();
 }

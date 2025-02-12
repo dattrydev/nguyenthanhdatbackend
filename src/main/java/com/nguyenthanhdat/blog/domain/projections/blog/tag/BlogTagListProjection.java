@@ -1,6 +1,6 @@
 package com.nguyenthanhdat.blog.domain.projections.blog.tag;
 
-public interface BlogTagProjection {
+public interface BlogTagListProjection {
     String getName();
     String getSlug();
     Integer getPostCount();

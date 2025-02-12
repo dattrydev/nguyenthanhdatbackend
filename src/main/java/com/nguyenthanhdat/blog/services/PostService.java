@@ -1,5 +1,6 @@
 package com.nguyenthanhdat.blog.services;
 
+import com.nguyenthanhdat.blog.domain.dtos.blog.post.BlogPostDto;
 import com.nguyenthanhdat.blog.domain.dtos.blog.post.BlogPostListPagingDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardCreatePostDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.DashboardPostDto;
@@ -26,4 +27,6 @@ public interface PostService {
     boolean isFieldExists(String field, String value);
 
     Optional<BlogPostListPagingDto> getBlogPostList(String title, String description, String category_name, String tags_name, int page, int size, String sortBy, String sortDirection);
+
+    Optional<BlogPostDto> getBlogPostBySlug(String slug);
 }

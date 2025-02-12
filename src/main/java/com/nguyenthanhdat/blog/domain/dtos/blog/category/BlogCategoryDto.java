@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class BlogCategoryDto {
     private String name;
     private String slug;
-    private Integer postCount;
 }

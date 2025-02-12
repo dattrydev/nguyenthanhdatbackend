@@ -1,5 +1,6 @@
 package com.nguyenthanhdat.blog.services.impl;
 
+import com.nguyenthanhdat.blog.domain.dtos.blog.post.BlogPostDto;
 import com.nguyenthanhdat.blog.domain.dtos.blog.post.BlogPostListDto;
 import com.nguyenthanhdat.blog.domain.dtos.blog.post.BlogPostListPagingDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.post.*;
@@ -253,6 +254,14 @@ public class PostServiceImpl implements PostService {
                 .build();
 
         return Optional.of(blogPostListPagingDto);
+    }
+
+    @Override
+    public Optional<BlogPostDto> getBlogPostBySlug(String slug) {
+        Post post = postRepository.findBySlug(slug);
+
+        return Optional.of(post)
+                .map(blogPostMapper::toBlogPostDto);
     }
 
 

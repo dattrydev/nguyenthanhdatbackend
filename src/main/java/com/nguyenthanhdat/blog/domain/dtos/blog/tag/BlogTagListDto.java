@@ -12,5 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class BlogTagListDto {
-    private List<BlogTagDto> tags;
+    private String name;
+    private String slug;
+    private Integer postCount;
 }

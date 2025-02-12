@@ -1,7 +1,7 @@
 package com.nguyenthanhdat.blog.domain.repositories;
 
 import com.nguyenthanhdat.blog.domain.entities.Tag;
-import com.nguyenthanhdat.blog.domain.projections.blog.tag.BlogTagProjection;
+import com.nguyenthanhdat.blog.domain.projections.blog.tag.BlogTagListProjection;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,5 +27,5 @@ public interface TagRepository extends JpaRepository<Tag, UUID>, JpaSpecificatio
     LEFT JOIN post_tags pt ON t.id = pt.tag_id
     GROUP BY t.id, t.name, t.slug
     """, nativeQuery = true)
-    List<BlogTagProjection> findAllTagsWithPostCount();
+    List<BlogTagListProjection> findAllTagsWithPostCount();
 }

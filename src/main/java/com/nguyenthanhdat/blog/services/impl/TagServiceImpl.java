@@ -1,10 +1,9 @@
 package com.nguyenthanhdat.blog.services.impl;
 
-import com.nguyenthanhdat.blog.domain.dtos.blog.tag.BlogTagDto;
 import com.nguyenthanhdat.blog.domain.dtos.blog.tag.BlogTagListDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.*;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
-import com.nguyenthanhdat.blog.domain.projections.blog.tag.BlogTagProjection;
+import com.nguyenthanhdat.blog.domain.projections.blog.tag.BlogTagListProjection;
 import com.nguyenthanhdat.blog.exceptions.ResourceAlreadyExistsException;
 import com.nguyenthanhdat.blog.exceptions.ResourceDeleteException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
@@ -156,18 +155,15 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Optional<BlogTagListDto> getBlogTagList() {
-        List<BlogTagProjection> blogTagProjections = tagRepository.findAllTagsWithPostCount();
+    public Optional<List<BlogTagListDto>> getBlogTagList() {
+        List<BlogTagListProjection> blogTagListProjections = tagRepository.findAllTagsWithPostCount();
 
-        List<BlogTagDto> blogTagDtos = blogTagProjections.stream()
-                .map(blogTagMapper::toBlogTagDto)
+        List<BlogTagListDto> blogTagListDtos = blogTagListProjections.stream()
+                .map(blogTagMapper::toBlogTagListDto)
                 .toList();
 
-        BlogTagListDto blogTagListDto = BlogTagListDto.builder()
-                .tags(blogTagDtos)
-                .build();
 
-        return Optional.of(blogTagListDto);
+        return Optional.of(blogTagListDtos);
     }
 
 
