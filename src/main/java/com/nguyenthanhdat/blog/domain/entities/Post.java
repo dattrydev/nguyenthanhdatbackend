@@ -31,6 +31,11 @@ public class Post {
     @Size(min = 3, max = 255, message = "Post title must be between 3 and 255 characters")
     private String title;
 
+    @Column(nullable = false)
+    @NotNull(message = "Post description cannot be null")
+    @Size(min = 3, max = 255, message = "Post description must be between 3 and 255 characters")
+    private String description;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     @NotNull(message = "Post content cannot be null")
     private String content;

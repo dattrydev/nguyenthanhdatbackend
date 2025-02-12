@@ -96,7 +96,7 @@ public class TagServiceImpl implements TagService {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tag with id " + id + " not found"));
 
-        if(tagRepository.existsByNameIgnoreCase(dashboardUpdateTagDto.getName())) {
+        if(tagRepository.existsByNameIgnoreCase(dashboardUpdateTagDto.getName() ) && !tag.getName().equalsIgnoreCase(dashboardUpdateTagDto.getName())) {
             throw new ResourceAlreadyExistsException("Tag with name " + dashboardUpdateTagDto.getName() + " already exists");
         } else {
             tag.setName(dashboardUpdateTagDto.getName());

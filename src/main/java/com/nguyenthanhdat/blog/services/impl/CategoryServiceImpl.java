@@ -101,6 +101,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         if(existingCategory.isPresent()){
             Category updatedCategory = existingCategory.get();
+
+            if (categoryRepository.existsByNameIgnoreCase(dashboardUpdateCategoryDto.getName()) && !updatedCategory.getName().equalsIgnoreCase(dashboardUpdateCategoryDto.getName())) {
+                throw new ResourceAlreadyExistsException("Category with name " + dashboardUpdateCategoryDto.getName() + " already exists");
+            }
             updatedCategory.setName(dashboardUpdateCategoryDto.getName());
             updatedCategory.setSlug(generateSlug(dashboardUpdateCategoryDto.getName()));
             categoryRepository.save(updatedCategory);

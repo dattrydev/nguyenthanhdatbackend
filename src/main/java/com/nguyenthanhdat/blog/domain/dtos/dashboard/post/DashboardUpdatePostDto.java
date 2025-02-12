@@ -19,6 +19,9 @@ public class DashboardUpdatePostDto {
     @Size(min = 3, max = 255, message = "Post title must be between 3 and 255 characters")
     private String title;
 
+    @Size(min = 3, max = 255, message = "Post description must be between 3 and 255 characters")
+    private String description;
+
     @Size(min = 10, max = 10000, message = "Post content must be between 10 and 10000 characters")
     private String content;
 

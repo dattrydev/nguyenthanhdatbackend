@@ -18,6 +18,7 @@ import java.util.UUID;
 public class DashboardPostDto {
     private UUID id;
     private String title;
+    private String description;
     private String content;
     private PostStatus status;
     private Integer reading_time;

@@ -116,6 +116,7 @@ public class PostServiceImpl implements PostService {
         Post post = Post.builder()
                 .title(title)
                 .slug(generatedSlug)
+                .description(dashboardCreatePostDto.getDescription())
                 .content(dashboardCreatePostDto.getContent())
                 .readingTime(readingTime)
                 .status(dashboardCreatePostDto.getStatus())
@@ -142,20 +143,25 @@ public class PostServiceImpl implements PostService {
 
         String convertedContent = presignedUrl.convertPresignedUrlToKey(dashboardUpdatePostDto.getContent());
 
-        if (dashboardUpdatePostDto.getTitle() != null) {
+        if (dashboardUpdatePostDto.getTitle() != null && !dashboardUpdatePostDto.getTitle().equals(post.getTitle())) {
             post.setTitle(dashboardUpdatePostDto.getTitle());
+
+            String generatedSlug = generateSlug(post.getTitle());
+            if (postRepository.existsBySlug(generatedSlug)) {
+                throw new ResourceAlreadyExistsException("Post with slug '" + generatedSlug + "' already exists.");
+            }
+            post.setSlug(generatedSlug);
         }
 
-        String generatedSlug = generateSlug(post.getTitle());
-        if (postRepository.existsBySlug(generatedSlug)) {
-            throw new ResourceAlreadyExistsException("Post with slug '" + generatedSlug + "' already exists.");
+        if(dashboardUpdatePostDto.getDescription() != null){
+            post.setDescription(dashboardUpdatePostDto.getDescription());
         }
-        post.setSlug(generatedSlug);
 
         if (dashboardUpdatePostDto.getContent() != null) {
             post.setContent(convertedContent);
             post.setReadingTime(ReadingTime.calculateReadingTime(dashboardUpdatePostDto.getContent()));
         }
+
         if (dashboardUpdatePostDto.getStatus() != null) {
             post.setStatus(dashboardUpdatePostDto.getStatus());
         }
