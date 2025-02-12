@@ -1,5 +1,6 @@
 package com.nguyenthanhdat.blog.services;
 
+import com.nguyenthanhdat.blog.domain.dtos.blog.tag.BlogTagListDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.*;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface TagService {
     void deleteTag(UUID id);
     void deleteTags(List<UUID> ids);
     boolean isFieldExists(String field, String value);
+
+    Optional<BlogTagListDto> getBlogTagList();
 }

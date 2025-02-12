@@ -1,10 +1,14 @@
 package com.nguyenthanhdat.blog.services.impl;
 
+import com.nguyenthanhdat.blog.domain.dtos.blog.tag.BlogTagDto;
+import com.nguyenthanhdat.blog.domain.dtos.blog.tag.BlogTagListDto;
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.tag.*;
 import com.nguyenthanhdat.blog.domain.entities.Tag;
+import com.nguyenthanhdat.blog.domain.projections.blog.tag.BlogTagProjection;
 import com.nguyenthanhdat.blog.exceptions.ResourceAlreadyExistsException;
 import com.nguyenthanhdat.blog.exceptions.ResourceDeleteException;
 import com.nguyenthanhdat.blog.exceptions.ResourceNotFoundException;
+import com.nguyenthanhdat.blog.mappers.blog.BlogTagMapper;
 import com.nguyenthanhdat.blog.mappers.dashboard.DashboardTagMapper;
 import com.nguyenthanhdat.blog.domain.repositories.TagRepository;
 import com.nguyenthanhdat.blog.services.TagService;
@@ -32,6 +36,7 @@ public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
     private final DashboardTagMapper dashboardTagMapper;
+    private final BlogTagMapper blogTagMapper;
 
     @Override
     public Optional<DashboardTagListPagingDto> getDashboardTagList(String name, int page, int size, String sortBy, String sortDirection) {
@@ -148,6 +153,21 @@ public class TagServiceImpl implements TagService {
             case "name" -> tagRepository.existsByName(value);
             default -> false;
         };
+    }
+
+    @Override
+    public Optional<BlogTagListDto> getBlogTagList() {
+        List<BlogTagProjection> blogTagProjections = tagRepository.findAllTagsWithPostCount();
+
+        List<BlogTagDto> blogTagDtos = blogTagProjections.stream()
+                .map(blogTagMapper::toBlogTagDto)
+                .toList();
+
+        BlogTagListDto blogTagListDto = BlogTagListDto.builder()
+                .tags(blogTagDtos)
+                .build();
+
+        return Optional.of(blogTagListDto);
     }
 
 
