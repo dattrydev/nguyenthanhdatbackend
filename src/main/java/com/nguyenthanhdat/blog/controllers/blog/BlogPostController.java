@@ -18,15 +18,15 @@ public class BlogPostController {
     public ResponseEntity<BlogPostListPagingDto> getBlogPostList(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String description,
-            @RequestParam(required = false) String categoryName,
-            @RequestParam(required = false) String tagsName,
+            @RequestParam(required = false) String categorySlug,
+            @RequestParam(required = false) String tagsSlug,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {
         BlogPostListPagingDto response = postService.getBlogPostList(
-                title, description, categoryName, tagsName, page, size, sortBy, sortDirection
+                title, description, categorySlug, tagsSlug, page, size, sortBy, sortDirection
         ).orElseThrow(() -> new ResourceNotFoundException("No post found"));
 
         return ResponseEntity.ok(response);
@@ -36,6 +36,16 @@ public class BlogPostController {
     public ResponseEntity<BlogPostDto> getBlogPostBySlug(@PathVariable String slug) {
         BlogPostDto response = postService.getBlogPostBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Post " + slug + " not found"));
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<BlogPostListPagingDto> searchBlogPost(
+            @PathVariable String keyword
+    ) {
+        BlogPostListPagingDto response = postService.searchBlogPost(keyword)
+                .orElseThrow(() -> new ResourceNotFoundException("No post found"));
 
         return ResponseEntity.ok(response);
     }

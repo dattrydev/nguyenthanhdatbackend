@@ -52,6 +52,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/dashboard/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/blog/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configure(http))
@@ -73,15 +74,16 @@ public class SecurityConfig {
     }
 
     @Configuration
-    public class WebConfig implements WebMvcConfigurer {
+    public static class WebConfig implements WebMvcConfigurer {
 
         @Override
         public void addCorsMappings(CorsRegistry registry) {
             registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:3000")
-                    .allowedMethods("*")
-                    .allowedHeaders("*")
-                    .allowCredentials(true);
+                    .allowedOrigins("http://localhost:3000", "https://www.nguyenthanhdat.software", "https://admin.nguyenthanhdat.software")
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedHeaders("Content-Type", "Authorization", "X-Requested-With")
+                    .allowCredentials(true)
+                    .maxAge(3600);
         }
     }
 

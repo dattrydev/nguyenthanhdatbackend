@@ -50,10 +50,10 @@ public class PostSpecification {
         };
     }
 
-    public static Specification<Post> hasCategoryName(String categoryName) {
+    public static Specification<Post> hasCategorySlug(String categorySlug) {
         return (root, query, criteriaBuilder) -> {
-            if (StringUtils.hasText(categoryName)) {
-                return criteriaBuilder.like(criteriaBuilder.lower(root.get("category").get("name")), "%" + categoryName.toLowerCase() + "%");
+            if (StringUtils.hasText(categorySlug)) {
+                return criteriaBuilder.like(criteriaBuilder.lower(root.get("category").get("slug")), "%" + categorySlug.toLowerCase() + "%");
             }
             return null;
         };
@@ -72,10 +72,10 @@ public class PostSpecification {
         };
     }
 
-    public static Specification<Post> hasTagsName(String tagsName) {
+    public static Specification<Post> hasTagsSlug(String tagsSlug) {
         return (root, query, criteriaBuilder) -> {
-            if (StringUtils.hasText(tagsName)) {
-                return criteriaBuilder.like(criteriaBuilder.lower(root.get("tags").get("name")), "%" + tagsName.toLowerCase() + "%");
+            if (StringUtils.hasText(tagsSlug)) {
+                return criteriaBuilder.like(criteriaBuilder.lower(root.join("tags").get("slug")), "%" + tagsSlug.toLowerCase() + "%");
             }
             return null;
         };

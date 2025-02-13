@@ -216,16 +216,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public boolean isFieldExists(String field, String value) {
-        switch (field.toLowerCase()) {
-            case "title":
-                return postRepository.existsByTitle(value);
-            default:
-                throw new IllegalArgumentException("Invalid field: " + field);
+        if (field.equalsIgnoreCase("title")) {
+            return postRepository.existsByTitle(value);
         }
+        throw new IllegalArgumentException("Invalid field: " + field);
     }
 
     @Override
-    public Optional<BlogPostListPagingDto> getBlogPostList(String title, String description, String categoryName, String tagsName, int page, int size, String sortBy, String sortDirection) {
+    public Optional<BlogPostListPagingDto> getBlogPostList(String title, String description, String categorySlug, String tagsSlug, int page, int size, String sortBy, String sortDirection) {
         page = page - 1;
         if (page < 0) {
             throw new IllegalArgumentException("Page number must be greater than 0");
@@ -236,8 +234,8 @@ public class PostServiceImpl implements PostService {
 
         Specification<Post> specification = Specification.where(PostSpecification.hasTitle(title))
                 .and(PostSpecification.hasDescription(description))
-                .and(PostSpecification.hasCategoryName(categoryName))
-                .and(PostSpecification.hasTagsName(tagsName));
+                .and(PostSpecification.hasCategorySlug(categorySlug))
+                .and(PostSpecification.hasTagsSlug(tagsSlug));
 
         Page<Post> postPage = postRepository.findAll(specification, pageable);
 
@@ -264,5 +262,24 @@ public class PostServiceImpl implements PostService {
                 .map(blogPostMapper::toBlogPostDto);
     }
 
+    @Override
+    public Optional<BlogPostListPagingDto> searchBlogPost(String keyword) {
 
+        Specification<Post> specification = Specification.where(PostSpecification.hasTitle(keyword))
+                .or(PostSpecification.hasDescription(keyword))
+                .or(PostSpecification.hasCategorySlug(keyword))
+                .or(PostSpecification.hasTagsSlug(keyword));
+
+        List<Post> postList = postRepository.findAll(specification);
+
+        if (postList.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<BlogPostListDto> postDtos = postList.stream()
+                .map(blogPostMapper::toBlogPostListDto)
+                .collect(Collectors.toList());
+
+        return Optional.of(new BlogPostListPagingDto(postDtos));
+    }
 }

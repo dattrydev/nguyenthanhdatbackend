@@ -26,7 +26,9 @@ public interface PostService {
 
     boolean isFieldExists(String field, String value);
 
-    Optional<BlogPostListPagingDto> getBlogPostList(String title, String description, String category_name, String tags_name, int page, int size, String sortBy, String sortDirection);
+    Optional<BlogPostListPagingDto> getBlogPostList(String title, String description, String categorySlug, String tagsSlug, int page, int size, String sortBy, String sortDirection);
 
     Optional<BlogPostDto> getBlogPostBySlug(String slug);
+
+    Optional<BlogPostListPagingDto> searchBlogPost(String keyword);
 }
