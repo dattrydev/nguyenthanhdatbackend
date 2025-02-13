@@ -1,6 +1,7 @@
 package com.nguyenthanhdat.blog.exceptions.handler;
 
 import com.nguyenthanhdat.blog.domain.dtos.dashboard.ApiErrorResponseDto;
+import com.nguyenthanhdat.blog.exceptions.TooManyLoginAttemptsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -44,5 +45,15 @@ public class AuthExceptionHandler {
                 .message("Authentication is required")
                 .build();
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(TooManyLoginAttemptsException.class)
+    public ResponseEntity<ApiErrorResponseDto> handleTooManyLoginAttemptsException(TooManyLoginAttemptsException e) {
+        log.error("Too many failed login attempts: ", e);
+        ApiErrorResponseDto error = ApiErrorResponseDto.builder()
+                .status(HttpStatus.TOO_MANY_REQUESTS.value())
+                .message(e.getMessage())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.TOO_MANY_REQUESTS);
     }
 }

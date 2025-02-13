@@ -7,6 +7,8 @@ import com.nguyenthanhdat.blog.domain.dtos.dashboard.user.UserDto;
 import com.nguyenthanhdat.blog.domain.entities.User;
 import com.nguyenthanhdat.blog.services.AuthenticationService;
 import com.nguyenthanhdat.blog.services.UserService;
+import com.nguyenthanhdat.blog.services.RateLimitService;
+import com.nguyenthanhdat.blog.exceptions.TooManyLoginAttemptsException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -16,38 +18,43 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping(path = "/api/dashboard/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthController.class);
+    private final RateLimitService rateLimitService;
 
     @PostMapping(path = "/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+        String userEmail = loginRequestDto.getEmail();
+
         try {
-            User user = userService.findUserByEmail(loginRequestDto.getEmail());
+            rateLimitService.tryConsume(userEmail);
+        } catch (TooManyLoginAttemptsException e) {
+            throw new TooManyLoginAttemptsException("Too many login attempts. Please try again later.");
+        }
+
+        try {
+            User user = userService.findUserByEmail(userEmail);
             if (user == null) {
-                log.warn("User not found: {}", loginRequestDto.getEmail());
-                throw new BadCredentialsException("User not found");
+                rateLimitService.recordFailedAttempt(userEmail);
+                throw new BadCredentialsException("User or password is incorrect");
             }
 
-            var userDetails = authenticationService.authenticate(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+            var userDetails = authenticationService.authenticate(userEmail, loginRequestDto.getPassword());
             String tokenValue = authenticationService.generateToken(userDetails);
             LoginResponseDto loginResponseDto = authenticationService.generateLoginResponse(user, tokenValue);
 
+            rateLimitService.resetFailedAttempts(userEmail);
             return ResponseEntity.ok(loginResponseDto);
 
         } catch (BadCredentialsException e) {
-            log.error("Invalid credentials for email: {}", loginRequestDto.getEmail());
-            throw new BadCredentialsException("Invalid credentials");
+            rateLimitService.recordFailedAttempt(userEmail);
+            throw new BadCredentialsException("User or password is incorrect");
         } catch (Exception e) {
-            log.error("Unexpected error during login", e);
-            throw new RuntimeException("Unexpected error");
+            throw new BadCredentialsException("User or password is incorrect");
         }
     }
 
@@ -75,14 +82,13 @@ public class AuthController {
                 );
             }
 
-
             return ResponseEntity.ok(
                     ValidateResponseDto.builder()
                             .message("Token is valid")
                             .user(
                                     UserDto.builder()
-                                    .email(userDetails.getUsername())
-                                    .build())
+                                            .email(userDetails.getUsername())
+                                            .build())
                             .build()
             );
         } catch (ExpiredJwtException e) {
@@ -105,5 +111,4 @@ public class AuthController {
             );
         }
     }
-
 }

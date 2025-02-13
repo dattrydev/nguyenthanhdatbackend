@@ -258,6 +258,10 @@ public class PostServiceImpl implements PostService {
     public Optional<BlogPostDto> getBlogPostBySlug(String slug) {
         Post post = postRepository.findBySlug(slug);
 
+        String convertedContent = presignedUrl.convertKeyToPresignedUrl(post.getContent());
+
+        post.setContent(convertedContent);
+
         return Optional.of(post)
                 .map(blogPostMapper::toBlogPostDto);
     }
