@@ -31,14 +31,14 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
-        userRepository.findByEmail("user@test.com").ifPresentOrElse(
+        userRepository.findByEmail("dattrydev@admin.com").ifPresentOrElse(
                 user -> {
                 },
                 () -> {
                     User user = new User();
-                    user.setEmail("user@test.com");
-                    user.setPassword(passwordEncoder().encode("password"));
-                    user.setName("User");
+                    user.setEmail("dattrydev@admin.com");
+                    user.setPassword(passwordEncoder().encode("d@ttrydev123"));
+                    user.setName("Nguyen Thanh Dat");
                     userRepository.save(user);
                 }
         );
