@@ -235,7 +235,8 @@ public class PostServiceImpl implements PostService {
         Specification<Post> specification = Specification.where(PostSpecification.hasTitle(title))
                 .and(PostSpecification.hasDescription(description))
                 .and(PostSpecification.hasCategorySlug(categorySlug))
-                .and(PostSpecification.hasTagsSlug(tagsSlug));
+                .and(PostSpecification.hasTagsSlug(tagsSlug))
+                .and(PostSpecification.hasStatus(Collections.singletonList(PostStatus.PUBLISHED)));
 
         Page<Post> postPage = postRepository.findAll(specification, pageable);
 
@@ -256,7 +257,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Optional<BlogPostDto> getBlogPostBySlug(String slug) {
-        Post post = postRepository.findBySlug(slug);
+        Post post = postRepository.findBySlugAndStatus(slug, PostStatus.PUBLISHED);
 
         String convertedContent = presignedUrl.convertKeyToPresignedUrl(post.getContent());
 
@@ -272,7 +273,8 @@ public class PostServiceImpl implements PostService {
         Specification<Post> specification = Specification.where(PostSpecification.hasTitle(keyword))
                 .or(PostSpecification.hasDescription(keyword))
                 .or(PostSpecification.hasCategorySlug(keyword))
-                .or(PostSpecification.hasTagsSlug(keyword));
+                .or(PostSpecification.hasTagsSlug(keyword))
+                .and(PostSpecification.hasStatus(Collections.singletonList(PostStatus.PUBLISHED)));
 
         List<Post> postList = postRepository.findAll(specification);
 
