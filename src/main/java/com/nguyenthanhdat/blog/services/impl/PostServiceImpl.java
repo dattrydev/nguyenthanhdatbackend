@@ -108,10 +108,10 @@ public class PostServiceImpl implements PostService {
             throw new ResourceAlreadyExistsException("Post with slug '" + generatedSlug + "' already exists.");
         }
 
-        Category category = categoryRepository.findById(dashboardCreatePostDto.getCategory_id())
-                .orElseThrow(() -> new ResourceNotFoundException("Category with ID '" + dashboardCreatePostDto.getCategory_id() + "' not found."));
+        Category category = categoryRepository.findById(dashboardCreatePostDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category with ID '" + dashboardCreatePostDto.getCategoryId() + "' not found."));
 
-        Set<Tag> tags = dashboardCreatePostDto.getTags_id().stream()
+        Set<Tag> tags = dashboardCreatePostDto.getTagsId().stream()
                 .map(tagId -> tagRepository.findById(tagId)
                         .orElseThrow(() -> new ResourceNotFoundException("Tag with ID '" + tagId + "' not found.")))
                 .collect(Collectors.toSet());

@@ -33,8 +33,8 @@ public class DashboardCreatePostDto {
     private PostStatus status;
 
     @NotNull(message = "Category ID cannot be null")
-    private UUID category_id;
+    private UUID categoryId;
 
     @NotEmpty(message = "At least one tag is required")
-    private Set<UUID> tags_id;
+    private Set<UUID> tagsId;
 }
