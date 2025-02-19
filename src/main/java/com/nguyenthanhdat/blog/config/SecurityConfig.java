@@ -80,7 +80,7 @@ public class SecurityConfig {
         public void addCorsMappings(CorsRegistry registry) {
             registry.addMapping("/**")
                     .allowedOrigins("http://localhost:3000", "https://www.nguyenthanhdat.software", "https://admin.nguyenthanhdat.software", "https://nguyenthanhdatmanagement.vercel.app")
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
                     .allowedHeaders("Content-Type", "Authorization", "X-Requested-With")
                     .allowCredentials(true)
                     .maxAge(3600);
