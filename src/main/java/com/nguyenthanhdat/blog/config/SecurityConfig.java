@@ -1,10 +1,10 @@
 package com.nguyenthanhdat.blog.config;
 
-import com.nguyenthanhdat.blog.domain.entities.User;
 import com.nguyenthanhdat.blog.domain.repositories.UserRepository;
 import com.nguyenthanhdat.blog.security.BlogUserDetailsService;
 import com.nguyenthanhdat.blog.security.JwtAuthenticationFilter;
 import com.nguyenthanhdat.blog.services.AuthenticationService;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,7 +23,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SecurityConfig {
-
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationService authenticationService) {
         return new JwtAuthenticationFilter(authenticationService);
@@ -31,18 +30,6 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
-        userRepository.findByEmail("dattrydev@admin.com").ifPresentOrElse(
-                user -> {
-                },
-                () -> {
-                    User user = new User();
-                    user.setEmail("dattrydev@admin.com");
-                    user.setPassword(passwordEncoder().encode("d@ttrydev123"));
-                    user.setName("Nguyen Thanh Dat");
-                    userRepository.save(user);
-                }
-        );
-
         return new BlogUserDetailsService(userRepository);
     }
 
@@ -75,11 +62,14 @@ public class SecurityConfig {
 
     @Configuration
     public static class WebConfig implements WebMvcConfigurer {
+        private final Dotenv dotenv = Dotenv.load();
 
         @Override
         public void addCorsMappings(CorsRegistry registry) {
+            String[] allowedOrigins = dotenv.get("CORS_ALLOWED_ORIGINS").split(",");
+
             registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:3000", "https://www.nguyenthanhdat.software", "https://admin.nguyenthanhdat.software", "https://nguyenthanhdatmanagement.vercel.app")
+                    .allowedOrigins(allowedOrigins)
                     .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
                     .allowedHeaders("Content-Type", "Authorization", "X-Requested-With")
                     .allowCredentials(true)
